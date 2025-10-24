@@ -1,5 +1,5 @@
-import Link from "next/link"
-import Image from "next/image"
+import Link from "next/link";
+import Image from "next/image";
 
 export default function HomePage() {
   return (
@@ -25,23 +25,30 @@ export default function HomePage() {
       </div>
 
       {/* 태그라인 */}
-      <p className="text-3xl font-semibold mb-12 text-balance">AI로 도서관 경험을 재설계하다!</p>
+      <p className="text-3xl font-semibold mb-12 text-balance">
+        AI로 도서관 경험을 재설계하다!
+      </p>
 
       {/* 기능 카드 섹션 */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-6xl">
         <FeatureCard
           href="/assistant"
           title="AI 연구 어시스턴트"
-          description="논문을 올리면 요약·영상까지 인용과 아이디어를 제안하는 AI 연구 파트너"
+          description="학술 검색부터 논문 영상화까지, 연구자의 모든 과정을 AI로 지원하는 통합 솔루션"
           number="1"
         />
 
-        <FeatureCard href="/chatbot" title="에이전트 챗봇" description="대화로 도서관을 이용하는 AI 비서" number="2" />
+        <FeatureCard
+          href="/chatbot"
+          title="통합 AI 챗봇"
+          description="좌석 예약부터 도서 추천까지, 하나의 챗봇으로 모든 도서관 서비스를 이용"
+          number="2"
+        />
 
         <FeatureCard
           href="/search"
           title="AI 시맨틱 검색"
-          description="검색어가 아니라 도서의 의미로 찾는다"
+          description="검색어가 아니라 도서의 의미로 찾는 차세대 검색 엔진"
           number="3"
         />
       </div>
@@ -49,10 +56,12 @@ export default function HomePage() {
       {/* 프레젠테이션 안내 */}
       <div className="mt-12 text-center text-sm text-white/70">
         <p>각 카드를 클릭하여 기능별 상세 설명을 확인하세요</p>
-        <p className="mt-1">프레젠테이션 모드에서 화살표 키로 이동 가능합니다</p>
+        <p className="mt-1">
+          프레젠테이션 모드에서 화살표 키로 이동 가능합니다
+        </p>
       </div>
     </main>
-  )
+  );
 }
 
 function FeatureCard({
@@ -61,10 +70,10 @@ function FeatureCard({
   description,
   number,
 }: {
-  href: string
-  title: string
-  description: string
-  number: string
+  href: string;
+  title: string;
+  description: string;
+  number: string;
 }) {
   return (
     <Link
@@ -78,12 +87,14 @@ function FeatureCard({
           </span>
           <h2 className="text-2xl font-bold text-indigo-800">{title}</h2>
         </div>
-        <p className="text-gray-700 mb-4 min-h-24 leading-relaxed">{description}</p>
+        <p className="text-gray-700 mb-4 min-h-24 leading-relaxed">
+          {description}
+        </p>
 
         <div className="w-full h-40 bg-gradient-to-br from-indigo-50 to-blue-50 rounded-lg flex items-center justify-center border border-indigo-100">
           <span className="text-indigo-400 font-medium">기능 {number}</span>
         </div>
       </div>
     </Link>
-  )
+  );
 }
