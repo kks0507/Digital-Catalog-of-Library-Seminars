@@ -16,9 +16,10 @@ interface Message {
   // 좌석 예약 관련
   recommendedSeats?: Seat[];
   selectedSeat?: Seat;
-  // 도서 추천 관련
-  recommendedBooks?: Book[];
-  selectedBook?: Book;
+  // 도서 추천 관련 - 3단계 구조
+  recommendedBiblios?: Biblio[]; // 1단계: 서지(책) 목록
+  itemsForSelection?: { biblio: Biblio; items: Item[] }; // 2단계: 대출 가능한 자료 목록
+  detailedItem?: { biblio: Biblio; item: Item }; // 3단계: 상세 정보
   // 확인 버튼
   showConfirmButtons?: boolean;
   confirmAction?: string; // "seat" | "book"
@@ -30,13 +31,24 @@ interface Seat {
   location: string;
 }
 
-interface Book {
+// Item: 실제 대출 가능한 자료 (물리적 책)
+interface Item {
+  id: string;
+  title: string;
+  isAvailable: boolean;
+  location: string;
+}
+
+// Biblio: 서지 정보 (책 메타데이터)
+interface Biblio {
   id: string;
   title: string;
   author: string;
   coverImage: string;
-  description: string;
   publication: string;
+  description: string;
+  itemIds: string[];
+  recommendations?: string[]; // 추천 도서 ID
 }
 
 // 샘플 데이터
@@ -47,32 +59,76 @@ const sampleSeats: Seat[] = [
   { id: "S102", name: "좌석 102", location: "제2열람실-1" },
 ];
 
-const sampleBooks: Book[] = [
-  {
+// Items 데이터 (실제 대출 가능한 자료들)
+const allItems: Record<string, Item> = {
+  py1: {
+    id: "py1",
+    title: "혼자 공부하는 파이썬 (개정판)",
+    isAvailable: true,
+    location: "2층 일반자료실",
+  },
+  py2: {
+    id: "py2",
+    title: "Do it! 점프 투 파이썬 (1권)",
+    isAvailable: false,
+    location: "1층 보존서고",
+  },
+  py3: {
+    id: "py3",
+    title: "Do it! 점프 투 파이썬 (2권)",
+    isAvailable: true,
+    location: "2층 일반자료실",
+  },
+  c1: {
+    id: "c1",
+    title: "혼자 공부하는 C언어 (초판)",
+    isAvailable: true,
+    location: "2층 일반자료실",
+  },
+  clean1: {
+    id: "clean1",
+    title: "Clean Code (영문판)",
+    isAvailable: true,
+    location: "3층 외국도서실",
+  },
+};
+
+// Biblios 데이터 (서지 정보)
+const allBiblios: Record<string, Biblio> = {
+  B1: {
     id: "B1",
     title: "혼자 공부하는 파이썬",
     author: "윤인성",
     coverImage: "/images/book-python.jpg",
-    description: "프로그래밍이 처음인 입문자를 위한 파이썬 책입니다.",
     publication: "한빛미디어, 2022",
+    description:
+      "프로그래밍이 처음인 입문자를 위한 파이썬 책입니다. 독학으로도 충분히 학습할 수 있도록 1:1 과외처럼 설명하며, 유용한 예제와 실습으로 코딩의 재미를 알려줍니다.",
+    itemIds: ["py1"],
+    recommendations: ["B2", "B3"],
   },
-  {
+  B2: {
     id: "B2",
     title: "Do it! 점프 투 파이썬",
     author: "박응용",
     coverImage: "/images/book-jump-to-python.jpg",
-    description: "파이썬의 기초부터 실용적인 내용까지 폭넓게 다룹니다.",
     publication: "이지스퍼블리싱, 2023",
+    description:
+      "파이썬의 기초부터 실용적인 내용까지 폭넓게 다루는 베스트셀러입니다. 명쾌한 설명과 다양한 예제로 파이썬의 핵심 문법을 빠르게 익힐 수 있습니다.",
+    itemIds: ["py2", "py3"],
+    recommendations: ["B1", "B3"],
   },
-  {
+  B3: {
     id: "B3",
-    title: "Clean Code",
+    title: "Clean Code(클린 코드)",
     author: "로버트 C. 마틴",
     coverImage: "/images/book-clean-code.jpg",
-    description: "더 나은 코드 작성을 위한 원칙과 기법들을 소개합니다.",
     publication: "인사이트, 2013",
+    description:
+      "더 나은 코드 작성을 위한 원칙과 실제적인 기법들을 소개하며, 모든 개발자의 필독서로 꼽힙니다.",
+    itemIds: ["clean1"],
+    recommendations: ["B1", "B2"],
   },
-];
+};
 
 // 자동완성 메시지
 const quickMessages = [
@@ -144,14 +200,18 @@ export default function ChatbotPage() {
         message.includes("파이썬") ||
         message.includes("프로그래밍")
       ) {
-        // 도서 추천 서비스
+        // 도서 추천 서비스 - 1단계: 서지 목록 표시
         botResponse = {
           id: (Date.now() + 2).toString(),
           type: "bot",
           content: `요청에 적합한 도서 목록입니다. 관심 있는 책을 선택하여 대출 가능한 자료를 확인해보세요.`,
           timestamp: new Date(),
           serviceType: "book",
-          recommendedBooks: sampleBooks,
+          recommendedBiblios: [
+            allBiblios["B1"],
+            allBiblios["B2"],
+            allBiblios["B3"],
+          ],
         };
       } else {
         // 기본 응답
@@ -219,14 +279,18 @@ export default function ChatbotPage() {
         inputValue.includes("코딩") ||
         inputValue.includes("프로그래밍")
       ) {
-        // 도서 추천 서비스
+        // 도서 추천 서비스 - 1단계: 서지 목록 표시
         botResponse = {
           id: (Date.now() + 2).toString(),
           type: "bot",
           content: `요청에 적합한 도서 목록입니다. 관심 있는 책을 선택하여 대출 가능한 자료를 확인해보세요.`,
           timestamp: new Date(),
           serviceType: "book",
-          recommendedBooks: sampleBooks,
+          recommendedBiblios: [
+            allBiblios["B1"],
+            allBiblios["B2"],
+            allBiblios["B3"],
+          ],
         };
       } else {
         // 기본 응답
@@ -273,20 +337,57 @@ export default function ChatbotPage() {
     setMessages((prev) => [...prev, userMessage, botMessage]);
   };
 
-  const handleBookSelect = (book: Book) => {
+  // 1단계: 서지(Biblio) 선택 → 대출 가능한 자료(Item) 목록 표시
+  const handleBiblioSelect = (biblio: Biblio) => {
+    const availableItems = biblio.itemIds
+      .map((id) => allItems[id])
+      .filter((item) => item && item.isAvailable);
+
     const userMessage: Message = {
       id: Date.now().toString(),
       type: "user",
-      content: `'${book.title}' 선택`,
+      content: `'${biblio.title}' 선택`,
       timestamp: new Date(),
     };
 
     const botMessage: Message = {
       id: (Date.now() + 1).toString(),
       type: "bot",
-      content: `**'${book.title}'**에 대한 상세 정보입니다.\n\n• **저자:** ${book.author}\n• **출판:** ${book.publication}\n• **설명:** ${book.description}\n\n북 사이렌오더를 신청하시겠습니까?`,
+      content: `**'${biblio.title}'**에 대해 대출 가능한 자료 목록입니다. 원하시는 자료를 선택해주세요.`,
       timestamp: new Date(),
-      selectedBook: book,
+      itemsForSelection: { biblio, items: availableItems },
+    };
+
+    setMessages((prev) => [...prev, userMessage, botMessage]);
+  };
+
+  // 2단계: 자료(Item) 선택 → 상세 정보 + 추천 도서 표시
+  const handleItemSelect = (item: Item, biblio: Biblio) => {
+    const botMessage: Message = {
+      id: Date.now().toString(),
+      type: "bot",
+      content: `**'${item.title}'**에 대한 상세 정보입니다.`,
+      timestamp: new Date(),
+      detailedItem: { biblio, item },
+    };
+
+    setMessages((prev) => [...prev, botMessage]);
+  };
+
+  // 3단계: 북 사이렌오더 신청 버튼 클릭 → 확인 메시지
+  const handleSirenOrder = (item: Item, biblio: Biblio) => {
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      type: "user",
+      content: `'${item.title}'을(를) 북 사이렌오더로 신청할게`,
+      timestamp: new Date(),
+    };
+
+    const botMessage: Message = {
+      id: (Date.now() + 1).toString(),
+      type: "bot",
+      content: `선택하신 **'${item.title}'**을(를) 북 사이렌오더로 신청하시겠습니까?`,
+      timestamp: new Date(),
       showConfirmButtons: true,
       confirmAction: "book",
     };
@@ -337,11 +438,16 @@ export default function ChatbotPage() {
           timestamp: new Date(),
         };
       } else {
-        const book = messages.find((m) => m.id === messageId)?.selectedBook;
         botMessage = {
           id: (Date.now() + 1).toString(),
           type: "bot",
-          content: `북 사이렌오더가 신청되었습니다.\n\n**'${book?.title}'**을(를) 북 사이렌오더로 신청하셨습니다. 도서가 준비되면 알림을 보내드리겠습니다.`,
+          content: `북 사이렌오더 신청이 성공적으로 완료되었습니다!\n\n• **북 사이렌오더 ID:** ${
+            Math.floor(Math.random() * 9000000) + 1000000
+          }\n• **수령처:** 중앙학술정보관 2층 대출/반납 데스크\n• **수령 기한:** ${new Date(
+            Date.now() + 7 * 24 * 60 * 60 * 1000
+          ).toLocaleDateString(
+            "ko-KR"
+          )} 18:00 까지\n\n필요한 다른 사항이 있으면 말씀해 주세요!`,
           timestamp: new Date(),
         };
       }
@@ -529,33 +635,159 @@ export default function ChatbotPage() {
                       </div>
                     )}
 
-                    {/* 도서 추천 */}
-                    {message.recommendedBooks && (
+                    {/* 1단계: 서지 목록 (도서 추천) */}
+                    {message.recommendedBiblios && (
                       <div className="mt-4 space-y-3">
-                        {message.recommendedBooks.map((book) => (
+                        {message.recommendedBiblios.map((biblio) => (
                           <div
-                            key={book.id}
-                            onClick={() => handleBookSelect(book)}
+                            key={biblio.id}
+                            onClick={() => handleBiblioSelect(biblio)}
                             className="flex cursor-pointer gap-4 rounded-lg border p-4 transition-all hover:border-blue-600 hover:shadow-md"
                           >
                             <img
-                              src={book.coverImage || "/placeholder.svg"}
-                              alt={book.title}
+                              src={biblio.coverImage || "/placeholder.svg"}
+                              alt={biblio.title}
                               className="h-32 w-24 rounded-md object-cover"
                             />
                             <div className="flex flex-col">
                               <h3 className="text-lg font-bold text-foreground">
-                                {book.title}
+                                {biblio.title}
                               </h3>
                               <p className="text-sm text-muted-foreground">
-                                {book.author}
+                                {biblio.author}
                               </p>
                               <p className="mt-auto text-xs text-muted-foreground">
-                                {book.publication}
+                                {biblio.publication}
                               </p>
                             </div>
                           </div>
                         ))}
+                      </div>
+                    )}
+
+                    {/* 2단계: 대출 가능한 자료 목록 */}
+                    {message.itemsForSelection && (
+                      <div className="mt-4 space-y-3">
+                        {message.itemsForSelection.items.map((item) => (
+                          <div
+                            key={item.id}
+                            onClick={() =>
+                              handleItemSelect(
+                                item,
+                                message.itemsForSelection!.biblio
+                              )
+                            }
+                            className="flex cursor-pointer gap-4 rounded-lg border p-4 transition-all hover:border-blue-600 hover:shadow-md"
+                          >
+                            <img
+                              src={
+                                message.itemsForSelection!.biblio.coverImage ||
+                                "/placeholder.svg"
+                              }
+                              alt={item.title}
+                              className="h-24 w-18 rounded-md object-cover"
+                            />
+                            <div className="flex flex-1 flex-col justify-between">
+                              <div>
+                                <h3 className="text-base font-semibold text-foreground">
+                                  {item.title}
+                                </h3>
+                                <p className="text-sm text-muted-foreground mt-1">
+                                  {item.location}
+                                </p>
+                              </div>
+                              <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700 self-start">
+                                대출 가능
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* 3단계: 상세 정보 + 추천 도서 */}
+                    {message.detailedItem && (
+                      <div className="mt-4 space-y-4">
+                        {/* 책 상세 정보 */}
+                        <div className="rounded-lg border p-4">
+                          <div className="flex gap-4">
+                            <img
+                              src={
+                                message.detailedItem.biblio.coverImage ||
+                                "/placeholder.svg"
+                              }
+                              alt={message.detailedItem.biblio.title}
+                              className="h-40 w-28 rounded-md object-cover flex-shrink-0"
+                            />
+                            <div className="flex flex-1 flex-col">
+                              <h3 className="text-xl font-bold text-foreground">
+                                {message.detailedItem.biblio.title}
+                              </h3>
+                              <p className="text-sm text-muted-foreground mt-1">
+                                {message.detailedItem.biblio.author}
+                              </p>
+                              <p className="text-sm text-muted-foreground mt-1">
+                                {message.detailedItem.biblio.publication}
+                              </p>
+                              <p className="text-sm text-foreground mt-3 mb-3">
+                                {message.detailedItem.biblio.description}
+                              </p>
+
+                              {/* 북 사이렌오더 신청 버튼 */}
+                              <Button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleSirenOrder(
+                                    message.detailedItem!.item,
+                                    message.detailedItem!.biblio
+                                  );
+                                }}
+                                className="bg-blue-600 hover:bg-blue-700 cursor-pointer w-auto px-6 py-2 text-sm self-start"
+                              >
+                                북 사이렌오더 신청
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* 함께 읽으면 좋은 책 */}
+                        {message.detailedItem.biblio.recommendations && (
+                          <div>
+                            <h4 className="text-base font-semibold text-foreground mb-3">
+                              함께 읽으면 좋은 책
+                            </h4>
+                            <div className="space-y-3">
+                              {message.detailedItem.biblio.recommendations.map(
+                                (recId) => {
+                                  const recBiblio = allBiblios[recId];
+                                  return (
+                                    <div
+                                      key={recId}
+                                      className="flex gap-3 rounded-lg border p-3"
+                                    >
+                                      <img
+                                        src={
+                                          recBiblio.coverImage ||
+                                          "/placeholder.svg"
+                                        }
+                                        alt={recBiblio.title}
+                                        className="h-20 w-16 rounded object-cover"
+                                      />
+                                      <div className="flex flex-col">
+                                        <h5 className="text-sm font-semibold text-foreground">
+                                          {recBiblio.title}
+                                        </h5>
+                                        <p className="text-xs text-muted-foreground">
+                                          {recBiblio.author}
+                                        </p>
+                                      </div>
+                                    </div>
+                                  );
+                                }
+                              )}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
