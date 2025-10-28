@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 
 export default function SearchPage() {
   return (
@@ -13,9 +14,13 @@ export default function SearchPage() {
               href="/"
               className="flex items-center hover:opacity-80 transition-opacity flex-shrink-0"
             >
-              <h1 className="text-2xl font-bold text-gray-900 whitespace-nowrap">
-                Digital Catalog of Library Seminars
-              </h1>
+              <Image
+                src="/biblo_black.png"
+                alt="Digital Catalog of Library Seminars"
+                width={200}
+                height={40}
+                className="h-8 w-auto"
+              />
             </Link>
             <nav className="flex items-center gap-4 flex-shrink-0">
               <Link
@@ -119,34 +124,48 @@ export default function SearchPage() {
           {/* 대시보드 기능 */}
           <div className="mt-6 bg-gradient-to-r from-indigo-50 to-blue-50 rounded-lg p-6 border border-indigo-100">
             <h4 className="font-semibold text-indigo-900 mb-3">
-              📈 대시보드 주요 기능
+              📚 서지 정보 관리 대시보드 주요 기능
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div className="flex items-start gap-2">
                 <span className="text-indigo-600 font-bold">•</span>
-                <span className="text-gray-700">실시간 도서관 이용 현황</span>
+                <span className="text-gray-700">서지 정보 정규화 및 관리</span>
               </div>
               <div className="flex items-start gap-2">
                 <span className="text-indigo-600 font-bold">•</span>
                 <span className="text-gray-700">
-                  인기 검색어 및 트렌드 분석
+                  FRBR 기반 Work/Expression/Manifestation 생성
                 </span>
               </div>
               <div className="flex items-start gap-2">
                 <span className="text-indigo-600 font-bold">•</span>
-                <span className="text-gray-700">대출/반납 통계 및 예측</span>
+                <span className="text-gray-700">
+                  책 별 Work(저작) 클러스터링 결과
+                </span>
               </div>
               <div className="flex items-start gap-2">
                 <span className="text-indigo-600 font-bold">•</span>
-                <span className="text-gray-700">사용자 행동 패턴 분석</span>
+                <span className="text-gray-700">기여도 히트맵 (1년)</span>
               </div>
               <div className="flex items-start gap-2">
                 <span className="text-indigo-600 font-bold">•</span>
-                <span className="text-gray-700">장서 관리 및 추천</span>
+                <span className="text-gray-700">
+                  실시간 데이터 처리 현황 모니터링
+                </span>
               </div>
               <div className="flex items-start gap-2">
                 <span className="text-indigo-600 font-bold">•</span>
-                <span className="text-gray-700">시스템 성능 모니터링</span>
+                <span className="text-gray-700">
+                  API 처리 효율성 및 속도 분석
+                </span>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="text-indigo-600 font-bold">•</span>
+                <span className="text-gray-700">오류율 및 품질 관리</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="text-indigo-600 font-bold">•</span>
+                <span className="text-gray-700">운영 메모 및 시스템 관리</span>
               </div>
             </div>
           </div>

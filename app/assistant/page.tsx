@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -237,9 +238,13 @@ export default function AssistantPage() {
               href="/"
               className="flex items-center hover:opacity-80 transition-opacity flex-shrink-0"
             >
-              <h1 className="text-2xl font-bold text-gray-900 whitespace-nowrap">
-                Digital Catalog of Library Seminars
-              </h1>
+              <Image
+                src="/biblo_black.png"
+                alt="Digital Catalog of Library Seminars"
+                width={200}
+                height={40}
+                className="h-8 w-auto"
+              />
             </Link>
             <nav className="flex items-center gap-4 flex-shrink-0">
               <button className="px-4 py-2 rounded-lg bg-blue-600 text-white whitespace-nowrap">

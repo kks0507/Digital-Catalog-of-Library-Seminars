@@ -61,14 +61,6 @@ export default function HomePage() {
           number="3"
         />
       </div>
-
-      {/* 프레젠테이션 안내 */}
-      <div className="mt-8 text-center text-sm text-white/60 font-light">
-        <p>각 카드를 클릭하여 기능별 상세 설명을 확인하세요</p>
-        <p className="mt-1">
-          프레젠테이션 모드에서 화살표 키로 이동 가능합니다
-        </p>
-      </div>
     </main>
   );
 }
