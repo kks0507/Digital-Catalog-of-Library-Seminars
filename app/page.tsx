@@ -6,8 +6,13 @@ export default function HomePage() {
     <main className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-[#1a237e] to-[#0d123b] text-white p-8">
       {/* 로고 및 헤더 */}
       <header className="w-full max-w-5xl flex justify-between items-center mb-8">
-        <Image src="/tensw-logo.jpg" alt="TENSW Logo" width={100} height={24} />
-        <span className="text-xl tracking-wide">주식회사 텐소프트웍스</span>
+        <Image
+          src="/tensw_white.png"
+          alt="TENSW Logo"
+          width={100}
+          height={24}
+        />
+        <span className="text-xl tracking-wide">(주)텐소프트웍스</span>
       </header>
 
       {/* 메인 타이틀 */}
@@ -17,10 +22,14 @@ export default function HomePage() {
 
       {/* 중앙 아이콘 */}
       <div className="my-6">
-        <div className="w-64 h-32 bg-white/10 rounded-lg flex items-center justify-center backdrop-blur-sm border border-white/20">
-          <span className="text-3xl font-bold text-white/90 tracking-wider">
-            Biblo AI
-          </span>
+        <div className="w-64 h-32 rounded-lg flex items-center justify-center backdrop-blur-sm ">
+          <Image
+            src="/biblo_white.png"
+            alt="Biblo AI"
+            width={120}
+            height={40}
+            className="h-10 w-auto"
+          />
         </div>
       </div>
 
