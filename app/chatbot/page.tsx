@@ -18,6 +18,7 @@ interface Message {
   selectedSeat?: Seat;
   // 도서 추천 관련 - 3단계 구조
   recommendedBiblios?: Biblio[]; // 1단계: 서지(책) 목록
+  unavailableBiblios?: { biblio: Biblio; message: string }[]; // 구매 신청 가능한 도서
   itemsForSelection?: { biblio: Biblio; items: Item[] }; // 2단계: 대출 가능한 자료 목록
   detailedItem?: { biblio: Biblio; item: Item }; // 3단계: 상세 정보
   // 확인 버튼
@@ -104,7 +105,7 @@ const allBiblios: Record<string, Biblio> = {
     description:
       "프로그래밍이 처음인 입문자를 위한 파이썬 책입니다. 독학으로도 충분히 학습할 수 있도록 1:1 과외처럼 설명하며, 유용한 예제와 실습으로 코딩의 재미를 알려줍니다.",
     itemIds: ["py1"],
-    recommendations: ["B2", "B3"],
+    recommendations: ["B2", "B4"],
   },
   B2: {
     id: "B2",
@@ -115,7 +116,7 @@ const allBiblios: Record<string, Biblio> = {
     description:
       "파이썬의 기초부터 실용적인 내용까지 폭넓게 다루는 베스트셀러입니다. 명쾌한 설명과 다양한 예제로 파이썬의 핵심 문법을 빠르게 익힐 수 있습니다.",
     itemIds: ["py2", "py3"],
-    recommendations: ["B1", "B3"],
+    recommendations: ["B1", "B4"],
   },
   B3: {
     id: "B3",
@@ -127,6 +128,27 @@ const allBiblios: Record<string, Biblio> = {
       "더 나은 코드 작성을 위한 원칙과 실제적인 기법들을 소개하며, 모든 개발자의 필독서로 꼽힙니다.",
     itemIds: ["clean1"],
     recommendations: ["B1", "B2"],
+  },
+  B4: {
+    id: "B4",
+    title: "혼자 공부하는 C언어",
+    author: "서현우",
+    coverImage: "/images/book-c.jpg",
+    publication: "한빛미디어, 2021",
+    description:
+      "C언어의 기초를 체계적으로 다지는 입문서입니다. 포인터와 같은 어려운 개념도 그림과 함께 쉽게 설명하여 처음 프로그래밍을 배우는 사람들에게 적합합니다.",
+    itemIds: ["c1"],
+    recommendations: ["B1", "B2"],
+  },
+  B8: {
+    id: "B8",
+    title: "코틀린 인 액션",
+    author: "드미트리 제메로프",
+    coverImage: "/images/book-kotlin.jpg",
+    publication: "에이콘, 2017",
+    description: "자바 개발자가 코틀린을 쉽게 배울 수 있도록 돕습니다.",
+    itemIds: [],
+    recommendations: [],
   },
 };
 
@@ -207,10 +229,12 @@ export default function ChatbotPage() {
           content: `요청에 적합한 도서 목록입니다. 관심 있는 책을 선택하여 대출 가능한 자료를 확인해보세요.`,
           timestamp: new Date(),
           serviceType: "book",
-          recommendedBiblios: [
-            allBiblios["B1"],
-            allBiblios["B2"],
-            allBiblios["B3"],
+          recommendedBiblios: [allBiblios["B1"], allBiblios["B2"]],
+          unavailableBiblios: [
+            {
+              biblio: allBiblios["B8"],
+              message: `우리 도서관에는 없지만 **'${allBiblios["B8"].title}'** 책도 인기가 많아요. 구매를 신청해 보시겠어요?`,
+            },
           ],
         };
       } else {
@@ -286,10 +310,12 @@ export default function ChatbotPage() {
           content: `요청에 적합한 도서 목록입니다. 관심 있는 책을 선택하여 대출 가능한 자료를 확인해보세요.`,
           timestamp: new Date(),
           serviceType: "book",
-          recommendedBiblios: [
-            allBiblios["B1"],
-            allBiblios["B2"],
-            allBiblios["B3"],
+          recommendedBiblios: [allBiblios["B1"], allBiblios["B2"]],
+          unavailableBiblios: [
+            {
+              biblio: allBiblios["B8"],
+              message: `우리 도서관에는 없지만 **'${allBiblios["B8"].title}'** 책도 인기가 많아요. 구매를 신청해 보시겠어요?`,
+            },
           ],
         };
       } else {
@@ -395,6 +421,27 @@ export default function ChatbotPage() {
     setMessages((prev) => [...prev, userMessage, botMessage]);
   };
 
+  // 구매 신청 핸들러
+  const handlePurchaseRequest = (biblio: Biblio) => {
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      type: "user",
+      content: `'${biblio.title}'을(를) 구매 신청할게`,
+      timestamp: new Date(),
+    };
+
+    const botMessage: Message = {
+      id: (Date.now() + 1).toString(),
+      type: "bot",
+      content: `선택하신 **'${biblio.title}'**을(를) 구매 신청하시겠습니까?`,
+      timestamp: new Date(),
+      showConfirmButtons: true,
+      confirmAction: "purchase",
+    };
+
+    setMessages((prev) => [...prev, userMessage, botMessage]);
+  };
+
   const handleConfirm = (
     messageId: string,
     action: string,
@@ -437,7 +484,7 @@ export default function ChatbotPage() {
           ).toLocaleString("ko-KR", { hour: "2-digit", minute: "2-digit" })}`,
           timestamp: new Date(),
         };
-      } else {
+      } else if (action === "book") {
         botMessage = {
           id: (Date.now() + 1).toString(),
           type: "bot",
@@ -448,6 +495,25 @@ export default function ChatbotPage() {
           ).toLocaleDateString(
             "ko-KR"
           )} 18:00 까지\n\n필요한 다른 사항이 있으면 말씀해 주세요!`,
+          timestamp: new Date(),
+        };
+      } else if (action === "purchase") {
+        // 구매 신청 페이지로 이동
+        window.open(
+          "https://lib2.skku.edu/hsc/library-services/data/request",
+          "_blank"
+        );
+        botMessage = {
+          id: (Date.now() + 1).toString(),
+          type: "bot",
+          content: "도서 구매 신청 페이지로 이동합니다.",
+          timestamp: new Date(),
+        };
+      } else {
+        botMessage = {
+          id: (Date.now() + 1).toString(),
+          type: "bot",
+          content: "처리되었습니다. 다른 도움이 필요하시면 말씀해주세요!",
           timestamp: new Date(),
         };
       }
@@ -662,6 +728,51 @@ export default function ChatbotPage() {
                             </div>
                           </div>
                         ))}
+                      </div>
+                    )}
+
+                    {/* 구매 신청 가능한 도서 */}
+                    {message.unavailableBiblios && (
+                      <div className="mt-6">
+                        <h4 className="text-base font-semibold text-foreground mb-3">
+                          우리 도서관에는 없지만 이런 책을 신청해보시는건
+                          어때요?
+                        </h4>
+                        <div className="space-y-3">
+                          {message.unavailableBiblios.map((unavailable) => (
+                            <div
+                              key={unavailable.biblio.id}
+                              className="rounded-lg border p-4"
+                            >
+                              <div className="flex flex-col">
+                                <p className="text-sm text-foreground mb-3">
+                                  {unavailable.message
+                                    .split("**")
+                                    .map((part, index) =>
+                                      index % 2 === 1 ? (
+                                        <strong
+                                          key={index}
+                                          className="font-semibold"
+                                        >
+                                          {part}
+                                        </strong>
+                                      ) : (
+                                        <span key={index}>{part}</span>
+                                      )
+                                    )}
+                                </p>
+                                <Button
+                                  onClick={() =>
+                                    handlePurchaseRequest(unavailable.biblio)
+                                  }
+                                  className="bg-blue-600 hover:bg-blue-700 cursor-pointer w-auto px-4 py-2 text-sm self-start"
+                                >
+                                  하러가기
+                                </Button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     )}
 
