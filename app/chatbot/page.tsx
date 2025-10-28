@@ -423,23 +423,11 @@ export default function ChatbotPage() {
 
   // 구매 신청 핸들러
   const handlePurchaseRequest = (biblio: Biblio) => {
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      type: "user",
-      content: `'${biblio.title}'을(를) 구매 신청할게`,
-      timestamp: new Date(),
-    };
-
-    const botMessage: Message = {
-      id: (Date.now() + 1).toString(),
-      type: "bot",
-      content: `선택하신 **'${biblio.title}'**을(를) 구매 신청하시겠습니까?`,
-      timestamp: new Date(),
-      showConfirmButtons: true,
-      confirmAction: "purchase",
-    };
-
-    setMessages((prev) => [...prev, userMessage, botMessage]);
+    // 바로 구매 신청 페이지로 이동
+    window.open(
+      "https://lib2.skku.edu/hsc/library-services/data/request",
+      "_blank"
+    );
   };
 
   const handleConfirm = (
@@ -495,18 +483,6 @@ export default function ChatbotPage() {
           ).toLocaleDateString(
             "ko-KR"
           )} 18:00 까지\n\n필요한 다른 사항이 있으면 말씀해 주세요!`,
-          timestamp: new Date(),
-        };
-      } else if (action === "purchase") {
-        // 구매 신청 페이지로 이동
-        window.open(
-          "https://lib2.skku.edu/hsc/library-services/data/request",
-          "_blank"
-        );
-        botMessage = {
-          id: (Date.now() + 1).toString(),
-          type: "bot",
-          content: "도서 구매 신청 페이지로 이동합니다.",
           timestamp: new Date(),
         };
       } else {
