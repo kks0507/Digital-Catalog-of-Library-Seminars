@@ -99,6 +99,13 @@ export default function AssistantPage() {
   const [profileGenerated, setProfileGenerated] = useState(false);
   const [profileProgress, setProfileProgress] = useState(0);
   const [isProfileParsing, setIsProfileParsing] = useState(false);
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [profileData, setProfileData] = useState({
+    coreTopics: "LLM, 인지 심리, 인간-컴퓨터 상호작용(HCI)",
+    methodologies: "실험 설계, 통계 분석, fMRI 데이터 분석",
+    theoreticalBasis: "인지주의 심리학, 구성주의 학습이론",
+    network: "김철수 (서울대), 이영희 (KAIST), John Doe (MIT)",
+  });
 
   // PDF to Video 상태
   const [videoStep, setVideoStep] = useState<VideoStep>("UPLOAD");
@@ -137,6 +144,7 @@ export default function AssistantPage() {
     // 시뮬레이션: 3초 후 프로필 생성 시작
     setTimeout(() => {
       setIsProfileParsing(false);
+      setProfileProgress(10); // 1.1 컴포넌트가 바로 꺼지도록 진행률 시작
 
       // 프로필 생성 진행률
       const progressInterval = setInterval(() => {
@@ -157,6 +165,36 @@ export default function AssistantPage() {
     setProfileGenerated(false);
     setProfileProgress(0);
     setIsProfileParsing(false);
+  };
+
+  const handleStartOver = () => {
+    setUploadedFiles([]);
+    setProfileGenerated(false);
+    setProfileProgress(0);
+    setIsProfileParsing(false);
+    setIsEditingProfile(false);
+  };
+
+  const handleEditProfile = () => {
+    if (isEditingProfile) {
+      // 수정 완료 시 현재 입력값들을 상태에 저장
+      const textareas = document.querySelectorAll(".profile-edit-textarea");
+      const newData = {
+        coreTopics:
+          (textareas[0] as HTMLTextAreaElement)?.value ||
+          profileData.coreTopics,
+        methodologies:
+          (textareas[1] as HTMLTextAreaElement)?.value ||
+          profileData.methodologies,
+        theoreticalBasis:
+          (textareas[2] as HTMLTextAreaElement)?.value ||
+          profileData.theoreticalBasis,
+        network:
+          (textareas[3] as HTMLTextAreaElement)?.value || profileData.network,
+      };
+      setProfileData(newData);
+    }
+    setIsEditingProfile(!isEditingProfile);
   };
 
   // PDF to Video 핸들러들
@@ -232,8 +270,8 @@ export default function AssistantPage() {
     <div className="min-h-screen bg-gray-50">
       {/* 헤더 */}
       <header className="flex bg-white border-b border-gray-200 sticky top-0 z-50">
-        <div className="flex justify-center w-full px-6 py-4">
-          <div className="flex justify-between w-full mr-12">
+        <div className="flex justify-center w-full px-4 sm:px-6 py-4">
+          <div className="flex justify-between w-full max-w-7xl">
             <Link
               href="/"
               className="flex items-center hover:opacity-80 transition-opacity flex-shrink-0"
@@ -243,22 +281,22 @@ export default function AssistantPage() {
                 alt="Digital Catalog of Library Seminars"
                 width={200}
                 height={40}
-                className="h-8 w-auto"
+                className="h-6 sm:h-8 w-auto"
               />
             </Link>
-            <nav className="flex items-center gap-4 flex-shrink-0">
-              <button className="px-4 py-2 rounded-lg bg-blue-600 text-white whitespace-nowrap">
+            <nav className="flex items-center gap-1 sm:gap-2 lg:gap-3 flex-shrink-0">
+              <button className="px-2 sm:px-3 py-1.5 rounded-lg bg-blue-600 text-white whitespace-nowrap text-xs sm:text-sm">
                 AI 연구 어시스턴트
               </button>
               <Link
                 href="/chatbot"
-                className="px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors whitespace-nowrap"
+                className="px-2 sm:px-3 py-1.5 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors whitespace-nowrap text-xs sm:text-sm"
               >
                 통합 AI 챗봇
               </Link>
               <Link
                 href="/search"
-                className="px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors whitespace-nowrap"
+                className="px-2 sm:px-3 py-1.5 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors whitespace-nowrap text-xs sm:text-sm"
               >
                 AI 시멘틱 검색
               </Link>
@@ -267,9 +305,64 @@ export default function AssistantPage() {
         </div>
       </header>
 
+      {/* 모바일 탭 네비게이션 */}
+      <div className="sm:hidden bg-white border-b border-gray-200 px-4 py-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1">
+              {activeTab === "profile" && (
+                <User className="h-4 w-4 text-blue-600" />
+              )}
+              {activeTab === "search" && (
+                <Search className="h-4 w-4 text-blue-600" />
+              )}
+              {activeTab === "video" && (
+                <Video className="h-4 w-4 text-blue-600" />
+              )}
+              <span className="text-sm font-medium text-gray-900">
+                {activeTab === "profile" && "1. 연구자 프로필 관리"}
+                {activeTab === "search" && "2. 연구 협업 검색"}
+                {activeTab === "video" && "3. PDF to Video 영상화"}
+              </span>
+            </div>
+            <span className="text-xs text-gray-500">
+              {activeTab === "profile" && "1/3"}
+              {activeTab === "search" && "2/3"}
+              {activeTab === "video" && "3/3"}
+            </span>
+          </div>
+          <div className="flex items-center gap-1">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                if (activeTab === "search") setActiveTab("profile");
+                if (activeTab === "video") setActiveTab("search");
+              }}
+              disabled={activeTab === "profile"}
+              className="h-7 px-2 text-xs"
+            >
+              이전
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                if (activeTab === "profile") setActiveTab("search");
+                if (activeTab === "search") setActiveTab("video");
+              }}
+              disabled={activeTab === "video"}
+              className="h-7 px-2 text-xs"
+            >
+              다음
+            </Button>
+          </div>
+        </div>
+      </div>
+
       <div className="flex">
-        {/* 사이드바 */}
-        <div className="w-80 min-w-80 h-screen sticky top-[73px] bg-white shadow-lg flex-shrink-0">
+        {/* 데스크톱 사이드바 */}
+        <div className="hidden sm:block w-80 min-w-80 h-screen sticky top-[73px] bg-white shadow-lg flex-shrink-0">
           <div className="p-6">
             <h1 className="text-2xl font-bold text-gray-900 mb-8">
               Researcher Platform
@@ -316,92 +409,94 @@ export default function AssistantPage() {
         </div>
 
         {/* 메인 콘텐츠 */}
-        <div className="flex-1 p-8">
+        <div className="flex-1 p-4 sm:p-6 lg:p-8">
           {activeTab === "profile" && (
-            <div className="max-w-4xl mx-auto">
-              <h2 className="text-3xl font-bold text-gray-900 mb-8">
+            <div className="max-w-full sm:max-w-4xl mx-auto">
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 sm:mb-8">
                 1. 연구자 프로필 생성 및 관리
               </h2>
 
               <div className="space-y-8">
                 {/* 1.1 연구 이력 업로드 */}
-                {!isProfileParsing && !profileGenerated && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-xl">
-                        1.1. 연구 이력 업로드
-                      </CardTitle>
-                      <CardDescription>
-                        연구 실적이 정리된 PDF 파일(KRI, Scopus 이력 등)을
-                        업로드하세요. 여러 파일을 선택할 수 있습니다.
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-4">
-                        <input
-                          type="file"
-                          id="file-upload"
-                          onChange={handleFileUpload}
-                          accept="application/pdf"
-                          multiple
-                          className="hidden"
-                        />
-                        <label
-                          htmlFor="file-upload"
-                          className="block border-2 border-dashed border-gray-300 rounded-lg p-12 text-center hover:border-blue-500 transition-colors cursor-pointer bg-gray-50"
-                        >
-                          <Upload className="h-12 w-12 mx-auto mb-4 text-blue-600" />
-                          <div className="text-blue-600 font-semibold text-lg mb-2">
-                            클릭하여 파일 선택
-                          </div>
-                          <div className="text-sm text-gray-500">
-                            여러 PDF 파일을 한 번에 선택할 수 있습니다
-                          </div>
-                        </label>
+                {!isProfileParsing &&
+                  !profileGenerated &&
+                  profileProgress === 0 && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-xl">
+                          1.1. 연구 이력 업로드
+                        </CardTitle>
+                        <CardDescription>
+                          연구 실적이 정리된 PDF 파일(KRI, Scopus 이력 등)을
+                          업로드하세요. 여러 파일을 선택할 수 있습니다.
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-4">
+                          <input
+                            type="file"
+                            id="file-upload"
+                            onChange={handleFileUpload}
+                            accept="application/pdf"
+                            multiple
+                            className="hidden"
+                          />
+                          <label
+                            htmlFor="file-upload"
+                            className="block border-2 border-dashed border-gray-300 rounded-lg p-12 text-center hover:border-blue-500 transition-colors cursor-pointer bg-gray-50"
+                          >
+                            <Upload className="h-12 w-12 mx-auto mb-4 text-blue-600" />
+                            <div className="text-blue-600 font-semibold text-lg mb-2">
+                              클릭하여 파일 선택
+                            </div>
+                            <div className="text-sm text-gray-500">
+                              여러 PDF 파일을 한 번에 선택할 수 있습니다
+                            </div>
+                          </label>
 
-                        {/* 업로드된 파일 목록 */}
-                        {uploadedFiles.length > 0 && (
-                          <div className="space-y-2">
-                            <h3 className="font-semibold text-sm text-gray-700">
-                              업로드된 파일 ({uploadedFiles.length}개)
-                            </h3>
-                            {uploadedFiles.map((file, index) => (
-                              <div
-                                key={index}
-                                className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-200"
-                              >
-                                <div className="flex items-center gap-2">
-                                  <FileText className="h-5 w-5 text-blue-600" />
-                                  <span className="text-sm font-medium text-gray-700">
-                                    {file.name}
-                                  </span>
-                                  <span className="text-xs text-gray-500">
-                                    ({(file.size / 1024).toFixed(1)} KB)
-                                  </span>
-                                </div>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => handleRemoveFile(index)}
-                                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                          {/* 업로드된 파일 목록 */}
+                          {uploadedFiles.length > 0 && (
+                            <div className="space-y-2">
+                              <h3 className="font-semibold text-sm text-gray-700">
+                                업로드된 파일 ({uploadedFiles.length}개)
+                              </h3>
+                              {uploadedFiles.map((file, index) => (
+                                <div
+                                  key={index}
+                                  className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-200"
                                 >
-                                  삭제
-                                </Button>
-                              </div>
-                            ))}
-                            <Button
-                              onClick={handleStartParsing}
-                              className="w-full bg-blue-600 hover:bg-blue-700 mt-4"
-                              disabled={uploadedFiles.length === 0}
-                            >
-                              프로필 생성 시작
-                            </Button>
-                          </div>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
+                                  <div className="flex items-center gap-2">
+                                    <FileText className="h-5 w-5 text-blue-600" />
+                                    <span className="text-sm font-medium text-gray-700">
+                                      {file.name}
+                                    </span>
+                                    <span className="text-xs text-gray-500">
+                                      ({(file.size / 1024).toFixed(1)} KB)
+                                    </span>
+                                  </div>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => handleRemoveFile(index)}
+                                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                  >
+                                    삭제
+                                  </Button>
+                                </div>
+                              ))}
+                              <Button
+                                onClick={handleStartParsing}
+                                className="w-full bg-blue-600 hover:bg-blue-700 mt-4"
+                                disabled={uploadedFiles.length === 0}
+                              >
+                                프로필 생성 시작
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
 
                 {/* PDF 파싱 중 */}
                 {isProfileParsing && (
@@ -418,10 +513,11 @@ export default function AssistantPage() {
                   </Card>
                 )}
 
-                {/* 1.2 프로필 생성 - 파일 업로드 후에만 표시 */}
+                {/* 1.2 프로필 생성 - 프로필 생성 시작 버튼 클릭 후에만 표시 */}
                 {uploadedFiles.length > 0 &&
                   !isProfileParsing &&
-                  !profileGenerated && (
+                  !profileGenerated &&
+                  profileProgress > 0 && (
                     <Card>
                       <CardHeader>
                         <CardTitle className="text-xl flex items-center justify-between">
@@ -495,152 +591,218 @@ export default function AssistantPage() {
                 {profileGenerated && (
                   <Card>
                     <CardHeader>
-                      <CardTitle className="text-xl">
-                        1.3. 프로필 관리
-                      </CardTitle>
-                      <CardDescription>
-                        생성된 프로필을 확인하고 수정할 수 있습니다.
-                      </CardDescription>
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <div>
+                          <CardTitle className="text-xl">
+                            1.3. 프로필 관리
+                          </CardTitle>
+                          <CardDescription>
+                            생성된 프로필을 확인하고 수정할 수 있습니다.
+                          </CardDescription>
+                        </div>
+                        <div className="flex flex-col sm:flex-row gap-2">
+                          <Button
+                            onClick={handleEditProfile}
+                            variant="outline"
+                            size="sm"
+                            className="w-full sm:w-auto"
+                          >
+                            {isEditingProfile ? "수정 완료" : "프로필 수정"}
+                          </Button>
+                          <Button
+                            onClick={handleStartOver}
+                            variant="outline"
+                            size="sm"
+                            className="w-full sm:w-auto text-red-600 hover:text-red-700 hover:bg-red-50"
+                          >
+                            프로필 다시 만들기
+                          </Button>
+                        </div>
+                      </div>
                     </CardHeader>
                     <CardContent>
-                      <div className="space-y-6">
+                      <div className="space-y-4 sm:space-y-6 w-full overflow-hidden">
                         {profileGenerated ? (
-                          <div className="space-y-6">
+                          <div className="space-y-4 sm:space-y-6 w-full">
                             {/* 1.1.1. 학문적 지향 (추출 결과) */}
-                            <div className="bg-blue-50 rounded-lg p-6">
-                              <div className="flex items-center justify-between mb-4">
-                                <h3 className="text-lg font-semibold text-blue-900">
+                            <div className="bg-blue-50 rounded-lg p-3 sm:p-6 w-full">
+                              <div className="mb-4">
+                                <h3 className="text-sm sm:text-lg font-semibold text-blue-900">
                                   1.1.1. 학문적 지향 (추출 결과)
                                 </h3>
-                                <Button variant="outline" size="sm">
-                                  프로필 수정
-                                </Button>
                               </div>
 
-                              <div className="space-y-4">
+                              <div className="space-y-3 sm:space-y-4">
                                 <div>
                                   <h4 className="font-medium text-blue-800 mb-2">
                                     핵심 주제 흐름:
                                   </h4>
-                                  <p className="text-blue-700">
-                                    LLM, 인지 심리, 인간-컴퓨터 상호작용(HCI)
-                                  </p>
+                                  {isEditingProfile ? (
+                                    <textarea
+                                      className="profile-edit-textarea w-full p-2 border border-blue-300 rounded text-blue-700 text-sm"
+                                      defaultValue={profileData.coreTopics}
+                                      rows={2}
+                                    />
+                                  ) : (
+                                    <p className="text-blue-700">
+                                      {profileData.coreTopics}
+                                    </p>
+                                  )}
                                 </div>
 
                                 <div>
                                   <h4 className="font-medium text-blue-800 mb-2">
                                     방법론적 선호도:
                                   </h4>
-                                  <p className="text-blue-700">
-                                    실험 설계, 통계 분석, fMRI 데이터 분석
-                                  </p>
+                                  {isEditingProfile ? (
+                                    <textarea
+                                      className="profile-edit-textarea w-full p-2 border border-blue-300 rounded text-blue-700 text-sm"
+                                      defaultValue={profileData.methodologies}
+                                      rows={2}
+                                    />
+                                  ) : (
+                                    <p className="text-blue-700">
+                                      {profileData.methodologies}
+                                    </p>
+                                  )}
                                 </div>
 
                                 <div>
                                   <h4 className="font-medium text-blue-800 mb-2">
                                     이론적 기반:
                                   </h4>
-                                  <p className="text-blue-700">
-                                    인지주의 심리학, 구성주의 학습이론
-                                  </p>
+                                  {isEditingProfile ? (
+                                    <textarea
+                                      className="profile-edit-textarea w-full p-2 border border-blue-300 rounded text-blue-700 text-sm"
+                                      defaultValue={
+                                        profileData.theoreticalBasis
+                                      }
+                                      rows={2}
+                                    />
+                                  ) : (
+                                    <p className="text-blue-700">
+                                      {profileData.theoreticalBasis}
+                                    </p>
+                                  )}
                                 </div>
 
                                 <div>
                                   <h4 className="font-medium text-blue-800 mb-2">
                                     공동 연구 네트워크:
                                   </h4>
-                                  <p className="text-blue-700">
-                                    김철수 (서울대), 이영희 (KAIST), John Doe
-                                    (MIT)
-                                  </p>
+                                  {isEditingProfile ? (
+                                    <textarea
+                                      className="profile-edit-textarea w-full p-2 border border-blue-300 rounded text-blue-700 text-sm"
+                                      defaultValue={profileData.network}
+                                      rows={2}
+                                    />
+                                  ) : (
+                                    <p className="text-blue-700">
+                                      {profileData.network}
+                                    </p>
+                                  )}
                                 </div>
                               </div>
                             </div>
 
                             {/* 1.1.2. 연구 실적 대시보드 */}
-                            <div className="bg-green-50 rounded-lg p-6">
-                              <h3 className="text-lg font-semibold text-green-900 mb-4">
+                            <div className="bg-green-50 rounded-lg p-3 sm:p-6 w-full">
+                              <h3 className="text-sm sm:text-lg font-semibold text-green-900 mb-4">
                                 1.1.2. 연구 실적 대시보드
                               </h3>
-                              <p className="text-sm text-green-700 mb-4">
+                              <p className="text-xs sm:text-sm text-green-700 mb-4">
                                 무엇을(리스트), 얼마나(양), 얼마나 잘(질), 어떤
                                 역할로(주도성), 어떻게(연구비) 연구했는지
                                 요약합니다.
                               </p>
 
-                              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                                 <div className="bg-white rounded-lg p-4 text-center">
-                                  <div className="text-2xl font-bold text-green-600">
+                                  <div className="text-xl sm:text-2xl font-bold text-green-600">
                                     28편
                                   </div>
-                                  <div className="text-sm text-gray-600">
+                                  <div className="text-xs sm:text-sm text-gray-600">
                                     총 논문 (얼마나)
                                   </div>
                                 </div>
                                 <div className="bg-white rounded-lg p-4 text-center">
-                                  <div className="text-2xl font-bold text-green-600">
+                                  <div className="text-xl sm:text-2xl font-bold text-green-600">
                                     6편
                                   </div>
-                                  <div className="text-sm text-gray-600">
+                                  <div className="text-xs sm:text-sm text-gray-600">
                                     Top 10% (Q1) (얼마나 잘)
                                   </div>
                                 </div>
                                 <div className="bg-white rounded-lg p-4 text-center">
-                                  <div className="text-2xl font-bold text-green-600">
+                                  <div className="text-xl sm:text-2xl font-bold text-green-600">
                                     75%
                                   </div>
-                                  <div className="text-sm text-gray-600">
+                                  <div className="text-xs sm:text-sm text-gray-600">
                                     주저자 비율 (주도성)
                                   </div>
                                 </div>
                                 <div className="bg-white rounded-lg p-4 text-center">
-                                  <div className="text-2xl font-bold text-green-600">
+                                  <div className="text-xl sm:text-2xl font-bold text-green-600">
                                     5억 2천만원
                                   </div>
-                                  <div className="text-sm text-gray-600">
+                                  <div className="text-xs sm:text-sm text-gray-600">
                                     총 연구비 (어떻게)
                                   </div>
                                 </div>
                               </div>
 
-                              <div className="bg-white rounded-lg p-4">
-                                <h4 className="font-semibold text-green-800 mb-3">
+                              <div className="bg-white rounded-lg p-3 sm:p-4">
+                                <h4 className="font-semibold text-green-800 mb-3 text-sm sm:text-base">
                                   상세 연구 실적 (무엇을)
                                 </h4>
-                                <div className="overflow-x-auto">
-                                  <table className="w-full text-sm">
+                                <div className="overflow-x-auto w-full">
+                                  <table className="w-full text-xs sm:text-sm min-w-[300px] sm:min-w-[400px]">
                                     <thead>
                                       <tr className="border-b">
-                                        <th className="text-left py-2">
+                                        <th className="text-left py-2 pr-2">
                                           논문 제목
                                         </th>
-                                        <th className="text-left py-2">역할</th>
-                                        <th className="text-left py-2">
+                                        <th className="text-left py-2 px-2">
+                                          역할
+                                        </th>
+                                        <th className="text-left py-2 pl-2">
                                           질(Quality)
                                         </th>
                                       </tr>
                                     </thead>
                                     <tbody>
                                       <tr className="border-b">
-                                        <td className="py-2">
+                                        <td className="py-2 pr-2 text-xs sm:text-sm">
                                           LLM의 환각 현상에 대한 인지적 분석
                                         </td>
-                                        <td className="py-2">주저자</td>
-                                        <td className="py-2">Q1</td>
+                                        <td className="py-2 px-2 text-xs sm:text-sm">
+                                          주저자
+                                        </td>
+                                        <td className="py-2 pl-2 text-xs sm:text-sm">
+                                          Q1
+                                        </td>
                                       </tr>
                                       <tr className="border-b">
-                                        <td className="py-2">
+                                        <td className="py-2 pr-2 text-xs sm:text-sm">
                                           인간 언어와 기계 언어의 구조적 비교
                                         </td>
-                                        <td className="py-2">공동저자</td>
-                                        <td className="py-2">Q2</td>
+                                        <td className="py-2 px-2 text-xs sm:text-sm">
+                                          공동저자
+                                        </td>
+                                        <td className="py-2 pl-2 text-xs sm:text-sm">
+                                          Q2
+                                        </td>
                                       </tr>
                                       <tr>
-                                        <td className="py-2">
+                                        <td className="py-2 pr-2 text-xs sm:text-sm">
                                           fMRI를 통한 언어 처리 중추 연구
                                         </td>
-                                        <td className="py-2">주저자</td>
-                                        <td className="py-2">Q1</td>
+                                        <td className="py-2 px-2 text-xs sm:text-sm">
+                                          주저자
+                                        </td>
+                                        <td className="py-2 pl-2 text-xs sm:text-sm">
+                                          Q1
+                                        </td>
                                       </tr>
                                     </tbody>
                                   </table>
@@ -649,17 +811,17 @@ export default function AssistantPage() {
                             </div>
 
                             {/* 1.1.3. 최종 메타데이터 */}
-                            <div className="bg-purple-50 rounded-lg p-6">
-                              <h3 className="text-lg font-semibold text-purple-900 mb-4">
+                            <div className="bg-purple-50 rounded-lg p-3 sm:p-6 w-full">
+                              <h3 className="text-sm sm:text-lg font-semibold text-purple-900 mb-4">
                                 1.1.3. 최종 메타데이터 (Key-Value)
                               </h3>
-                              <p className="text-sm text-purple-700 mb-4">
+                              <p className="text-xs sm:text-sm text-purple-700 mb-4">
                                 이 데이터는 1.2 협업 검색 시스템의 검색 인덱스로
                                 활용됩니다.
                               </p>
 
-                              <div className="bg-gray-900 rounded-lg p-4 text-green-400 text-sm font-mono">
-                                <pre>{`{
+                              <div className="bg-gray-900 rounded-lg p-2 sm:p-4 text-green-400 text-xs sm:text-sm font-mono overflow-x-auto w-full">
+                                <pre className="whitespace-pre-wrap break-words">{`{
   "id": "researcher-001",
   "keywords": [
     "LLM",
@@ -707,7 +869,7 @@ export default function AssistantPage() {
 
           {activeTab === "search" && (
             <div className="max-w-4xl mx-auto">
-              <h2 className="text-3xl font-bold text-gray-900 mb-8">
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 sm:mb-8">
                 1.2. 연구 협업 검색 시스템
               </h2>
 
@@ -729,7 +891,7 @@ export default function AssistantPage() {
                         defaultValue="나는 언어모델 (LLM) 이 심리를 가지고 있는지, 인간 언어의 구조를 정확하게 이해하는지, 확률에 의해 제시하는지, 사람과 기계를 비교했을 때 누가 언어 능력이 더 뛰어난지 비교하는 연구를 진행하고 싶어"
                       />
 
-                      <div className="flex gap-4">
+                      <div className="flex flex-col sm:flex-row gap-4">
                         <Button
                           onClick={() => handleSearch("internal")}
                           disabled={isSearching}
@@ -743,7 +905,10 @@ export default function AssistantPage() {
                           ) : (
                             <>
                               <Search className="h-4 w-4 mr-2" />
-                              교내 협력 연구자 서칭
+                              <span className="hidden sm:inline">
+                                교내 협력 연구자 서칭
+                              </span>
+                              <span className="sm:hidden">교내 검색</span>
                             </>
                           )}
                         </Button>
@@ -761,7 +926,10 @@ export default function AssistantPage() {
                           ) : (
                             <>
                               <Search className="h-4 w-4 mr-2" />
-                              교외 협력 연구자 서칭
+                              <span className="hidden sm:inline">
+                                교외 협력 연구자 서칭
+                              </span>
+                              <span className="sm:hidden">교외 검색</span>
                             </>
                           )}
                         </Button>
@@ -808,19 +976,19 @@ export default function AssistantPage() {
                         {searchType === "internal" && (
                           <>
                             {/* 박지현 교수 */}
-                            <div className="p-6 border rounded-lg bg-white">
-                              <div className="flex items-start justify-between mb-4">
+                            <div className="p-4 sm:p-6 border rounded-lg bg-white">
+                              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-4 gap-2">
                                 <div>
-                                  <h3 className="text-2xl font-bold text-gray-900">
+                                  <h3 className="text-xl sm:text-2xl font-bold text-gray-900">
                                     박지현 교수
                                   </h3>
-                                  <p className="text-gray-600">
+                                  <p className="text-sm sm:text-base text-gray-600">
                                     (한국대학교 심리학과 (교내))
                                   </p>
                                 </div>
                                 <a
                                   href="mailto:jhpark@korea.ac.kr"
-                                  className="text-blue-600 hover:underline"
+                                  className="text-blue-600 hover:underline text-sm sm:text-base break-all"
                                 >
                                   jhpark@korea.ac.kr
                                 </a>
@@ -858,19 +1026,19 @@ export default function AssistantPage() {
                             </div>
 
                             {/* 김태영 교수 */}
-                            <div className="p-6 border rounded-lg bg-white">
-                              <div className="flex items-start justify-between mb-4">
+                            <div className="p-4 sm:p-6 border rounded-lg bg-white">
+                              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-4 gap-2">
                                 <div>
-                                  <h3 className="text-2xl font-bold text-gray-900">
+                                  <h3 className="text-xl sm:text-2xl font-bold text-gray-900">
                                     김태영 교수
                                   </h3>
-                                  <p className="text-gray-600">
+                                  <p className="text-sm sm:text-base text-gray-600">
                                     (한국대학교 컴퓨터공학과 (교내))
                                   </p>
                                 </div>
                                 <a
                                   href="mailto:tykim@korea.ac.kr"
-                                  className="text-blue-600 hover:underline"
+                                  className="text-blue-600 hover:underline text-sm sm:text-base break-all"
                                 >
                                   tykim@korea.ac.kr
                                 </a>
@@ -907,19 +1075,19 @@ export default function AssistantPage() {
                             </div>
 
                             {/* 이수진 교수 */}
-                            <div className="p-6 border rounded-lg bg-white">
-                              <div className="flex items-start justify-between mb-4">
+                            <div className="p-4 sm:p-6 border rounded-lg bg-white">
+                              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-4 gap-2">
                                 <div>
-                                  <h3 className="text-2xl font-bold text-gray-900">
+                                  <h3 className="text-xl sm:text-2xl font-bold text-gray-900">
                                     이수진 교수
                                   </h3>
-                                  <p className="text-gray-600">
+                                  <p className="text-sm sm:text-base text-gray-600">
                                     (한국대학교 언어학과 (교내))
                                   </p>
                                 </div>
                                 <a
                                   href="mailto:sjlee@korea.ac.kr"
-                                  className="text-blue-600 hover:underline"
+                                  className="text-blue-600 hover:underline text-sm sm:text-base break-all"
                                 >
                                   sjlee@korea.ac.kr
                                 </a>
@@ -956,19 +1124,19 @@ export default function AssistantPage() {
                             </div>
 
                             {/* 정민호 교수 */}
-                            <div className="p-6 border rounded-lg bg-white">
-                              <div className="flex items-start justify-between mb-4">
+                            <div className="p-4 sm:p-6 border rounded-lg bg-white">
+                              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-4 gap-2">
                                 <div>
-                                  <h3 className="text-2xl font-bold text-gray-900">
+                                  <h3 className="text-xl sm:text-2xl font-bold text-gray-900">
                                     정민호 교수
                                   </h3>
-                                  <p className="text-gray-600">
+                                  <p className="text-sm sm:text-base text-gray-600">
                                     (한국대학교 뇌과학과 (교내))
                                   </p>
                                 </div>
                                 <a
                                   href="mailto:mhjung@korea.ac.kr"
-                                  className="text-blue-600 hover:underline"
+                                  className="text-blue-600 hover:underline text-sm sm:text-base break-all"
                                 >
                                   mhjung@korea.ac.kr
                                 </a>
@@ -1004,19 +1172,19 @@ export default function AssistantPage() {
                             </div>
 
                             {/* 최은영 교수 */}
-                            <div className="p-6 border rounded-lg bg-white">
-                              <div className="flex items-start justify-between mb-4">
+                            <div className="p-4 sm:p-6 border rounded-lg bg-white">
+                              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-4 gap-2">
                                 <div>
-                                  <h3 className="text-2xl font-bold text-gray-900">
+                                  <h3 className="text-xl sm:text-2xl font-bold text-gray-900">
                                     최은영 교수
                                   </h3>
-                                  <p className="text-gray-600">
+                                  <p className="text-sm sm:text-base text-gray-600">
                                     (한국대학교 철학과 (교내))
                                   </p>
                                 </div>
                                 <a
                                   href="mailto:eychoi@korea.ac.kr"
-                                  className="text-blue-600 hover:underline"
+                                  className="text-blue-600 hover:underline text-sm sm:text-base break-all"
                                 >
                                   eychoi@korea.ac.kr
                                 </a>
@@ -1057,19 +1225,19 @@ export default function AssistantPage() {
                         {searchType === "external" && (
                           <>
                             {/* John Smith 교수 */}
-                            <div className="p-6 border rounded-lg bg-white">
-                              <div className="flex items-start justify-between mb-4">
+                            <div className="p-4 sm:p-6 border rounded-lg bg-white">
+                              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-4 gap-2">
                                 <div>
-                                  <h3 className="text-2xl font-bold text-gray-900">
+                                  <h3 className="text-xl sm:text-2xl font-bold text-gray-900">
                                     John Smith 교수
                                   </h3>
-                                  <p className="text-gray-600">
+                                  <p className="text-sm sm:text-base text-gray-600">
                                     (MIT 컴퓨터과학과 (교외))
                                   </p>
                                 </div>
                                 <a
                                   href="mailto:jsmith@mit.edu"
-                                  className="text-blue-600 hover:underline"
+                                  className="text-blue-600 hover:underline text-sm sm:text-base break-all"
                                 >
                                   jsmith@mit.edu
                                 </a>
@@ -1104,19 +1272,19 @@ export default function AssistantPage() {
                             </div>
 
                             {/* Maria Garcia 교수 */}
-                            <div className="p-6 border rounded-lg bg-white">
-                              <div className="flex items-start justify-between mb-4">
+                            <div className="p-4 sm:p-6 border rounded-lg bg-white">
+                              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-4 gap-2">
                                 <div>
-                                  <h3 className="text-2xl font-bold text-gray-900">
+                                  <h3 className="text-xl sm:text-2xl font-bold text-gray-900">
                                     Maria Garcia 교수
                                   </h3>
-                                  <p className="text-gray-600">
+                                  <p className="text-sm sm:text-base text-gray-600">
                                     (Stanford 언어학과 (교외))
                                   </p>
                                 </div>
                                 <a
                                   href="mailto:mgarcia@stanford.edu"
-                                  className="text-blue-600 hover:underline"
+                                  className="text-blue-600 hover:underline text-sm sm:text-base break-all"
                                 >
                                   mgarcia@stanford.edu
                                 </a>
@@ -1151,19 +1319,19 @@ export default function AssistantPage() {
                             </div>
 
                             {/* Yuki Tanaka 교수 */}
-                            <div className="p-6 border rounded-lg bg-white">
-                              <div className="flex items-start justify-between mb-4">
+                            <div className="p-4 sm:p-6 border rounded-lg bg-white">
+                              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-4 gap-2">
                                 <div>
-                                  <h3 className="text-2xl font-bold text-gray-900">
+                                  <h3 className="text-xl sm:text-2xl font-bold text-gray-900">
                                     Yuki Tanaka 교수
                                   </h3>
-                                  <p className="text-gray-600">
+                                  <p className="text-sm sm:text-base text-gray-600">
                                     (University of Tokyo 인지과학과 (교외))
                                   </p>
                                 </div>
                                 <a
                                   href="mailto:ytanaka@u-tokyo.ac.jp"
-                                  className="text-blue-600 hover:underline"
+                                  className="text-blue-600 hover:underline text-sm sm:text-base break-all"
                                 >
                                   ytanaka@u-tokyo.ac.jp
                                 </a>
@@ -1208,7 +1376,7 @@ export default function AssistantPage() {
 
           {activeTab === "video" && (
             <div className="max-w-4xl mx-auto">
-              <h2 className="text-3xl font-bold text-gray-900 mb-8">
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 sm:mb-8">
                 3. PDF to Video 영상화
               </h2>
 
@@ -1303,15 +1471,33 @@ export default function AssistantPage() {
                     </CardHeader>
                     <CardContent>
                       <Tabs defaultValue="text" className="w-full">
-                        <TabsList className="grid w-full grid-cols-3">
-                          <TabsTrigger value="text">
-                            본문 텍스트 (1.1.1)
+                        <TabsList className="grid w-full grid-cols-3 text-xs sm:text-sm">
+                          <TabsTrigger
+                            value="text"
+                            className="text-xs sm:text-sm"
+                          >
+                            <span className="hidden sm:inline">
+                              본문 텍스트 (1.1.1)
+                            </span>
+                            <span className="sm:hidden">텍스트</span>
                           </TabsTrigger>
-                          <TabsTrigger value="tables">
-                            테이블 (1.1.2)
+                          <TabsTrigger
+                            value="tables"
+                            className="text-xs sm:text-sm"
+                          >
+                            <span className="hidden sm:inline">
+                              테이블 (1.1.2)
+                            </span>
+                            <span className="sm:hidden">테이블</span>
                           </TabsTrigger>
-                          <TabsTrigger value="images">
-                            이미지 (1.1.3)
+                          <TabsTrigger
+                            value="images"
+                            className="text-xs sm:text-sm"
+                          >
+                            <span className="hidden sm:inline">
+                              이미지 (1.1.3)
+                            </span>
+                            <span className="sm:hidden">이미지</span>
                           </TabsTrigger>
                         </TabsList>
 
@@ -1340,13 +1526,15 @@ export default function AssistantPage() {
                         </TabsContent>
 
                         <TabsContent value="tables" className="mt-6 space-y-4">
-                          <p className="text-sm text-gray-600">
+                          <p className="text-xs sm:text-sm text-gray-600">
                             <strong>요청사항 반영:</strong> 추출된 테이블
                             데이터를 JSON 형식으로 표시합니다.
                           </p>
-                          <pre className="bg-slate-900 text-slate-100 p-4 rounded-lg overflow-x-auto text-sm font-mono">
-                            {JSON.stringify(mockParsedTableJson, null, 2)}
-                          </pre>
+                          <div className="bg-slate-900 text-slate-100 p-2 sm:p-4 rounded-lg overflow-x-auto text-xs sm:text-sm font-mono max-h-60 overflow-y-auto">
+                            <pre className="whitespace-pre-wrap break-words">
+                              {JSON.stringify(mockParsedTableJson, null, 2)}
+                            </pre>
+                          </div>
                         </TabsContent>
 
                         <TabsContent value="images" className="mt-6 space-y-4">
@@ -1354,11 +1542,11 @@ export default function AssistantPage() {
                             <strong>요청사항 반영:</strong> 추출된 이미지를
                             별도로 표시합니다.
                           </p>
-                          <div className="grid grid-cols-2 gap-4">
-                            <div className="h-32 bg-gray-100 rounded-lg flex items-center justify-center text-sm text-gray-600">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div className="h-32 bg-gray-100 rounded-lg flex items-center justify-center text-xs sm:text-sm text-gray-600">
                               Figure 1: Model
                             </div>
-                            <div className="h-32 bg-gray-100 rounded-lg flex items-center justify-center text-sm text-gray-600">
+                            <div className="h-32 bg-gray-100 rounded-lg flex items-center justify-center text-xs sm:text-sm text-gray-600">
                               Figure 2: Graph
                             </div>
                           </div>
@@ -1372,6 +1560,7 @@ export default function AssistantPage() {
                             setVideoFile(null);
                             setVideoStep("UPLOAD");
                           }}
+                          className="flex-1"
                         >
                           처음으로
                         </Button>
@@ -1380,7 +1569,7 @@ export default function AssistantPage() {
                           size="lg"
                           className="flex-1"
                         >
-                          스크립트 생성하기 (1.2)
+                          스크립트 생성
                         </Button>
                       </div>
                     </CardContent>
@@ -1391,10 +1580,10 @@ export default function AssistantPage() {
                 {videoStep === "SCRIPTING" && (
                   <Card>
                     <CardHeader>
-                      <CardTitle>
+                      <CardTitle className="text-lg sm:text-xl">
                         1.2. 영상 스크립트 생성 (90초 / 영어)
                       </CardTitle>
-                      <CardDescription>
+                      <CardDescription className="text-sm">
                         파싱된 데이터를 기반으로 생성된 스크립트입니다.
                         (요청하신 5가지 구조 반영)
                       </CardDescription>
@@ -1404,31 +1593,31 @@ export default function AssistantPage() {
                         value={videoScript}
                         onChange={(e) => setVideoScript(e.target.value)}
                         readOnly={!isEditingScript}
-                        rows={20}
-                        className="font-mono text-sm"
+                        rows={12}
+                        className="font-mono text-xs sm:text-sm resize-none"
                       />
 
                       <div className="flex gap-3">
                         <Button
                           variant="outline"
                           onClick={() => setVideoStep("PARSED")}
+                          className="flex-1"
                         >
                           이전 단계
                         </Button>
                         <Button
                           onClick={() => setIsEditingScript(!isEditingScript)}
                           variant="secondary"
+                          className="flex-1"
                         >
-                          {isEditingScript
-                            ? "수정 완료"
-                            : "스크립트 수정 (1.2.1)"}
+                          {isEditingScript ? "수정 완료" : "스크립트 수정"}
                         </Button>
                         <Button
                           onClick={handleStartGeneration}
                           size="lg"
                           className="flex-1"
                         >
-                          영상 제작 시작 (1.3 ~ 1.6)
+                          영상 제작 시작
                         </Button>
                       </div>
                     </CardContent>
