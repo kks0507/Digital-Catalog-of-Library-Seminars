@@ -4,9 +4,9 @@ build:
   commands:
     build:
       - echo "Installing dependencies with yarn"
-      - yarn install --frozen-lockfile
+      - yarn install --frozen-lockfile --ignore-engines
       - echo "Building the application"
-      - yarn build
+      - NODE_OPTIONS="--max-old-space-size=4096" yarn build
 run:
   runtime-version: 18
   command: yarn start
