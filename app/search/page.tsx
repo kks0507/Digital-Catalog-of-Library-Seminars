@@ -8,8 +8,8 @@ export default function SearchPage() {
     <div className="min-h-screen bg-background">
       {/* 헤더 */}
       <header className="flex bg-white border-b border-gray-200 sticky top-0 z-50">
-        <div className="flex justify-center w-full px-6 py-4">
-          <div className="flex justify-between w-full mr-12">
+        <div className="flex justify-center w-full px-4 sm:px-6 py-4">
+          <div className="flex justify-between w-full max-w-7xl">
             <Link
               href="/"
               className="flex items-center hover:opacity-80 transition-opacity flex-shrink-0"
@@ -19,23 +19,23 @@ export default function SearchPage() {
                 alt="Digital Catalog of Library Seminars"
                 width={200}
                 height={40}
-                className="h-8 w-auto"
+                className="h-6 sm:h-8 w-auto"
               />
             </Link>
-            <nav className="flex items-center gap-4 flex-shrink-0">
+            <nav className="flex items-center gap-1 sm:gap-2 lg:gap-3 flex-shrink-0">
               <Link
                 href="/assistant"
-                className="px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors whitespace-nowrap"
+                className="px-2 sm:px-3 py-1.5 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors whitespace-nowrap text-xs sm:text-sm"
               >
                 AI 연구 어시스턴트
               </Link>
               <Link
                 href="/chatbot"
-                className="px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors whitespace-nowrap"
+                className="px-2 sm:px-3 py-1.5 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors whitespace-nowrap text-xs sm:text-sm"
               >
                 통합 AI 챗봇
               </Link>
-              <button className="px-4 py-2 rounded-lg bg-blue-600 text-white whitespace-nowrap">
+              <button className="px-2 sm:px-3 py-1.5 rounded-lg bg-blue-600 text-white whitespace-nowrap text-xs sm:text-sm">
                 AI 시멘틱 검색
               </button>
             </nav>
@@ -43,17 +43,17 @@ export default function SearchPage() {
         </div>
       </header>
 
-      <main className="container mx-auto p-8 max-w-6xl">
-        <h1 className="text-4xl font-bold mb-8 text-indigo-900">
+      <main className="container mx-auto p-4 sm:p-6 lg:p-8 max-w-6xl">
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-6 sm:mb-8 text-indigo-900">
           3. AI 시맨틱 검색엔진과 데이터 관리
         </h1>
 
         {/* 3.1 탐색형 AI 검색 엔진 */}
-        <section className="mb-12">
-          <h2 className="text-3xl font-semibold mb-4 text-indigo-800">
+        <section className="mb-8 sm:mb-12">
+          <h2 className="text-xl sm:text-2xl lg:text-3xl font-semibold mb-4 text-indigo-800">
             3.1 탐색형 AI 검색 엔진 (차세대)
           </h2>
-          <p className="text-lg text-gray-700 mb-6 leading-relaxed">
+          <p className="text-sm sm:text-base lg:text-lg text-gray-700 mb-4 sm:mb-6 leading-relaxed">
             단순 키워드 검색이 아닌, 문맥과 의미를 이해하는 시맨틱 검색 기술로
             사용자가 원하는 정확한 정보와 연관 자료를 탐색형 UI로 제공합니다.
           </p>
@@ -63,8 +63,8 @@ export default function SearchPage() {
             <iframe
               src="https://lib2.skku.edu/search"
               width="100%"
-              height="900px"
-              className="border-0"
+              height="600px"
+              className="border-0 sm:h-[700px] lg:h-[900px]"
               title="SKKU 도서관 AI 검색 엔진"
               sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
             />
@@ -100,11 +100,11 @@ export default function SearchPage() {
         </section>
 
         {/* 3.2 데이터 관리 대시보드 */}
-        <section className="mb-12">
-          <h2 className="text-3xl font-semibold mb-4 text-indigo-800">
+        <section className="mb-8 sm:mb-12">
+          <h2 className="text-xl sm:text-2xl lg:text-3xl font-semibold mb-4 text-indigo-800">
             3.2 데이터 관리를 위한 대시보드
           </h2>
-          <p className="text-lg text-gray-700 mb-6 leading-relaxed">
+          <p className="text-sm sm:text-base lg:text-lg text-gray-700 mb-4 sm:mb-6 leading-relaxed">
             도서관 데이터 현황, 이용자 통계, 검색 트렌드 등을 한눈에 파악할 수
             있는 관리자용 대시보드를 제공하여 효율적인 데이터 관리를 지원합니다.
           </p>
@@ -114,19 +114,19 @@ export default function SearchPage() {
             <iframe
               src="https://library-data-dashboard.vercel.app/"
               width="100%"
-              height="1200px"
-              className="border-0"
+              height="800px"
+              className="border-0 sm:h-[1000px] lg:h-[1200px]"
               title="서지 정보 관리 대시보드"
               sandbox="allow-scripts allow-same-origin allow-forms"
             />
           </div>
 
           {/* 대시보드 기능 */}
-          <div className="mt-6 bg-gradient-to-r from-indigo-50 to-blue-50 rounded-lg p-6 border border-indigo-100">
-            <h4 className="font-semibold text-indigo-900 mb-3">
+          <div className="mt-4 sm:mt-6 bg-gradient-to-r from-indigo-50 to-blue-50 rounded-lg p-4 sm:p-6 border border-indigo-100">
+            <h4 className="font-semibold text-indigo-900 mb-3 text-sm sm:text-base">
               📚 서지 정보 관리 대시보드 주요 기능
             </h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
               <div className="flex items-start gap-2">
                 <span className="text-indigo-600 font-bold">•</span>
                 <span className="text-gray-700">서지 정보 정규화 및 관리</span>
