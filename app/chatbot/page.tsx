@@ -510,8 +510,8 @@ export default function ChatbotPage() {
     <div className="min-h-screen bg-background">
       {/* 헤더 */}
       <header className="flex bg-white border-b border-gray-200 sticky top-0 z-50">
-        <div className="flex justify-center w-full px-6 py-4">
-          <div className="flex justify-between w-full mr-12">
+        <div className="flex justify-center w-full px-4 sm:px-6 py-4">
+          <div className="flex justify-between w-full max-w-7xl">
             <Link
               href="/"
               className="flex items-center hover:opacity-80 transition-opacity flex-shrink-0"
@@ -521,22 +521,22 @@ export default function ChatbotPage() {
                 alt="Digital Catalog of Library Seminars"
                 width={200}
                 height={40}
-                className="h-8 w-auto"
+                className="h-6 sm:h-8 w-auto"
               />
             </Link>
-            <nav className="flex items-center gap-4 flex-shrink-0">
+            <nav className="flex items-center gap-1 sm:gap-2 lg:gap-3 flex-shrink-0">
               <Link
                 href="/assistant"
-                className="px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors whitespace-nowrap"
+                className="px-2 sm:px-3 py-1.5 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors whitespace-nowrap text-xs sm:text-sm"
               >
                 AI 연구 어시스턴트
               </Link>
-              <button className="px-4 py-2 rounded-lg bg-blue-600 text-white whitespace-nowrap">
+              <button className="px-2 sm:px-3 py-1.5 rounded-lg bg-blue-600 text-white whitespace-nowrap text-xs sm:text-sm">
                 통합 AI 챗봇
               </button>
               <Link
                 href="/search"
-                className="px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors whitespace-nowrap"
+                className="px-2 sm:px-3 py-1.5 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors whitespace-nowrap text-xs sm:text-sm"
               >
                 AI 시멘틱 검색
               </Link>
@@ -606,13 +606,13 @@ export default function ChatbotPage() {
                     </div>
                   )}
                   <div
-                    className={`max-w-xl rounded-lg px-4 py-3 ${
+                    className={`max-w-xs sm:max-w-md lg:max-w-xl rounded-lg px-3 sm:px-4 py-2 sm:py-3 ${
                       isUser
                         ? "bg-blue-600 text-white"
                         : "border bg-card text-card-foreground"
                     }`}
                   >
-                    <p className="whitespace-pre-wrap text-sm">
+                    <p className="whitespace-pre-wrap text-xs sm:text-sm">
                       {message.content.split("**").map((part, index) =>
                         index % 2 === 1 ? (
                           <strong key={index} className="font-semibold">
@@ -626,7 +626,7 @@ export default function ChatbotPage() {
 
                     {/* 확인 버튼 (예/아니오) */}
                     {message.showConfirmButtons && message.confirmAction && (
-                      <div className="mt-4 flex gap-2">
+                      <div className="mt-3 sm:mt-4 flex gap-2">
                         <button
                           onClick={() =>
                             handleConfirm(
@@ -635,7 +635,7 @@ export default function ChatbotPage() {
                               true
                             )
                           }
-                          className="flex-1 px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors font-medium"
+                          className="flex-1 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors font-medium text-xs sm:text-sm"
                         >
                           예
                         </button>
@@ -647,7 +647,7 @@ export default function ChatbotPage() {
                               false
                             )
                           }
-                          className="flex-1 px-4 py-2 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors font-medium"
+                          className="flex-1 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors font-medium text-xs sm:text-sm"
                         >
                           아니오
                         </button>
@@ -656,24 +656,24 @@ export default function ChatbotPage() {
 
                     {/* 좌석 추천 */}
                     {message.recommendedSeats && (
-                      <div className="mt-4 space-y-3">
+                      <div className="mt-3 sm:mt-4 space-y-2 sm:space-y-3">
                         {message.recommendedSeats.map((seat) => (
                           <div
                             key={seat.id}
                             onClick={() => handleSeatSelect(seat)}
-                            className="flex cursor-pointer items-center gap-4 rounded-lg border p-4 transition-all hover:border-blue-600 hover:shadow-md"
+                            className="flex cursor-pointer items-center gap-3 sm:gap-4 rounded-lg border p-3 sm:p-4 transition-all hover:border-blue-600 hover:shadow-md"
                           >
-                            <div className="flex h-16 w-16 items-center justify-center rounded-md bg-blue-50 text-blue-600">
-                              <Armchair className="h-8 w-8" />
+                            <div className="flex h-12 w-12 sm:h-16 sm:w-16 items-center justify-center rounded-md bg-blue-50 text-blue-600">
+                              <Armchair className="h-6 w-6 sm:h-8 sm:w-8" />
                             </div>
                             <div className="flex flex-col">
-                              <span className="font-semibold text-blue-600">
+                              <span className="font-semibold text-blue-600 text-xs sm:text-sm">
                                 이용 가능
                               </span>
-                              <h3 className="mt-1 text-lg font-bold text-foreground">
+                              <h3 className="mt-1 text-sm sm:text-lg font-bold text-foreground">
                                 {seat.name}
                               </h3>
-                              <p className="text-sm text-muted-foreground">
+                              <p className="text-xs sm:text-sm text-muted-foreground">
                                 {seat.location}
                               </p>
                             </div>
@@ -684,23 +684,23 @@ export default function ChatbotPage() {
 
                     {/* 1단계: 서지 목록 (도서 추천) */}
                     {message.recommendedBiblios && (
-                      <div className="mt-4 space-y-3">
+                      <div className="mt-3 sm:mt-4 space-y-2 sm:space-y-3">
                         {message.recommendedBiblios.map((biblio) => (
                           <div
                             key={biblio.id}
                             onClick={() => handleBiblioSelect(biblio)}
-                            className="flex cursor-pointer gap-4 rounded-lg border p-4 transition-all hover:border-blue-600 hover:shadow-md"
+                            className="flex cursor-pointer gap-3 sm:gap-4 rounded-lg border p-3 sm:p-4 transition-all hover:border-blue-600 hover:shadow-md"
                           >
                             <img
                               src={biblio.coverImage || "/placeholder.svg"}
                               alt={biblio.title}
-                              className="h-32 w-24 rounded-md object-cover"
+                              className="h-20 w-16 sm:h-32 sm:w-24 rounded-md object-cover"
                             />
                             <div className="flex flex-col">
-                              <h3 className="text-lg font-bold text-foreground">
+                              <h3 className="text-sm sm:text-lg font-bold text-foreground">
                                 {biblio.title}
                               </h3>
-                              <p className="text-sm text-muted-foreground">
+                              <p className="text-xs sm:text-sm text-muted-foreground">
                                 {biblio.author}
                               </p>
                               <p className="mt-auto text-xs text-muted-foreground">
@@ -714,19 +714,19 @@ export default function ChatbotPage() {
 
                     {/* 구매 신청 가능한 도서 */}
                     {message.unavailableBiblios && (
-                      <div className="mt-6">
-                        <h4 className="text-base font-semibold text-foreground mb-3">
+                      <div className="mt-4 sm:mt-6">
+                        <h4 className="text-sm sm:text-base font-semibold text-foreground mb-2 sm:mb-3">
                           우리 도서관에는 없지만 이런 책을 신청해보시는건
                           어때요?
                         </h4>
-                        <div className="space-y-3">
+                        <div className="space-y-2 sm:space-y-3">
                           {message.unavailableBiblios.map((unavailable) => (
                             <div
                               key={unavailable.biblio.id}
-                              className="rounded-lg border p-4"
+                              className="rounded-lg border p-3 sm:p-4"
                             >
                               <div className="flex flex-col">
-                                <p className="text-sm text-foreground mb-3">
+                                <p className="text-xs sm:text-sm text-foreground mb-2 sm:mb-3">
                                   {unavailable.message
                                     .split("**")
                                     .map((part, index) =>
@@ -746,7 +746,7 @@ export default function ChatbotPage() {
                                   onClick={() =>
                                     handlePurchaseRequest(unavailable.biblio)
                                   }
-                                  className="bg-blue-600 hover:bg-blue-700 cursor-pointer w-auto px-4 py-2 text-sm self-start"
+                                  className="bg-blue-600 hover:bg-blue-700 cursor-pointer w-auto px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm self-start"
                                 >
                                   하러가기
                                 </Button>
@@ -759,7 +759,7 @@ export default function ChatbotPage() {
 
                     {/* 2단계: 대출 가능한 자료 목록 */}
                     {message.itemsForSelection && (
-                      <div className="mt-4 space-y-3">
+                      <div className="mt-3 sm:mt-4 space-y-2 sm:space-y-3">
                         {message.itemsForSelection.items.map((item) => (
                           <div
                             key={item.id}
@@ -769,7 +769,7 @@ export default function ChatbotPage() {
                                 message.itemsForSelection!.biblio
                               )
                             }
-                            className="flex cursor-pointer gap-4 rounded-lg border p-4 transition-all hover:border-blue-600 hover:shadow-md"
+                            className="flex cursor-pointer gap-3 sm:gap-4 rounded-lg border p-3 sm:p-4 transition-all hover:border-blue-600 hover:shadow-md"
                           >
                             <img
                               src={
@@ -777,18 +777,18 @@ export default function ChatbotPage() {
                                 "/placeholder.svg"
                               }
                               alt={item.title}
-                              className="h-24 w-18 rounded-md object-cover"
+                              className="h-20 w-16 sm:h-24 sm:w-18 rounded-md object-cover"
                             />
                             <div className="flex flex-1 flex-col justify-between">
                               <div>
-                                <h3 className="text-base font-semibold text-foreground">
+                                <h3 className="text-sm sm:text-base font-semibold text-foreground">
                                   {item.title}
                                 </h3>
-                                <p className="text-sm text-muted-foreground mt-1">
+                                <p className="text-xs sm:text-sm text-muted-foreground mt-1">
                                   {item.location}
                                 </p>
                               </div>
-                              <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700 self-start">
+                              <span className="rounded-full bg-green-100 px-2 sm:px-3 py-1 text-xs font-semibold text-green-700 self-start">
                                 대출 가능
                               </span>
                             </div>
@@ -799,29 +799,29 @@ export default function ChatbotPage() {
 
                     {/* 3단계: 상세 정보 + 추천 도서 */}
                     {message.detailedItem && (
-                      <div className="mt-4 space-y-4">
+                      <div className="mt-3 sm:mt-4 space-y-3 sm:space-y-4">
                         {/* 책 상세 정보 */}
-                        <div className="rounded-lg border p-4">
-                          <div className="flex gap-4">
+                        <div className="rounded-lg border p-3 sm:p-4">
+                          <div className="flex gap-3 sm:gap-4">
                             <img
                               src={
                                 message.detailedItem.biblio.coverImage ||
                                 "/placeholder.svg"
                               }
                               alt={message.detailedItem.biblio.title}
-                              className="h-40 w-28 rounded-md object-cover flex-shrink-0"
+                              className="h-24 w-18 sm:h-40 sm:w-28 rounded-md object-cover flex-shrink-0"
                             />
                             <div className="flex flex-1 flex-col">
-                              <h3 className="text-xl font-bold text-foreground">
+                              <h3 className="text-base sm:text-xl font-bold text-foreground">
                                 {message.detailedItem.biblio.title}
                               </h3>
-                              <p className="text-sm text-muted-foreground mt-1">
+                              <p className="text-xs sm:text-sm text-muted-foreground mt-1">
                                 {message.detailedItem.biblio.author}
                               </p>
-                              <p className="text-sm text-muted-foreground mt-1">
+                              <p className="text-xs sm:text-sm text-muted-foreground mt-1">
                                 {message.detailedItem.biblio.publication}
                               </p>
-                              <p className="text-sm text-foreground mt-3 mb-3">
+                              <p className="text-xs sm:text-sm text-foreground mt-2 sm:mt-3 mb-2 sm:mb-3">
                                 {message.detailedItem.biblio.description}
                               </p>
 
@@ -834,7 +834,7 @@ export default function ChatbotPage() {
                                     message.detailedItem!.biblio
                                   );
                                 }}
-                                className="bg-blue-600 hover:bg-blue-700 cursor-pointer w-auto px-6 py-2 text-sm self-start"
+                                className="bg-blue-600 hover:bg-blue-700 cursor-pointer w-auto px-4 sm:px-6 py-1.5 sm:py-2 text-xs sm:text-sm self-start"
                               >
                                 북 사이렌오더 신청
                               </Button>
@@ -845,17 +845,17 @@ export default function ChatbotPage() {
                         {/* 함께 읽으면 좋은 책 */}
                         {message.detailedItem.biblio.recommendations && (
                           <div>
-                            <h4 className="text-base font-semibold text-foreground mb-3">
+                            <h4 className="text-sm sm:text-base font-semibold text-foreground mb-2 sm:mb-3">
                               함께 읽으면 좋은 책
                             </h4>
-                            <div className="space-y-3">
+                            <div className="space-y-2 sm:space-y-3">
                               {message.detailedItem.biblio.recommendations.map(
                                 (recId) => {
                                   const recBiblio = allBiblios[recId];
                                   return (
                                     <div
                                       key={recId}
-                                      className="flex gap-3 rounded-lg border p-3"
+                                      className="flex gap-2 sm:gap-3 rounded-lg border p-2 sm:p-3"
                                     >
                                       <img
                                         src={
@@ -863,10 +863,10 @@ export default function ChatbotPage() {
                                           "/placeholder.svg"
                                         }
                                         alt={recBiblio.title}
-                                        className="h-20 w-16 rounded object-cover"
+                                        className="h-16 w-12 sm:h-20 sm:w-16 rounded object-cover"
                                       />
                                       <div className="flex flex-col">
-                                        <h5 className="text-sm font-semibold text-foreground">
+                                        <h5 className="text-xs sm:text-sm font-semibold text-foreground">
                                           {recBiblio.title}
                                         </h5>
                                         <p className="text-xs text-muted-foreground">
@@ -892,36 +892,39 @@ export default function ChatbotPage() {
         </div>
 
         {/* 입력 영역 */}
-        <div className="border-t border-border bg-card px-6 py-4">
+        <div className="border-t border-border bg-card px-3 sm:px-6 py-3 sm:py-4">
           <div className="mx-auto max-w-4xl">
             {/* 자동완성 메시지 버튼 - 항상 표시 */}
-            <div className="flex flex-wrap gap-2 mb-3">
+            <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-2 sm:mb-3">
               {quickMessages.map((msg, index) => (
                 <button
                   key={index}
                   onClick={() => handleQuickMessage(msg)}
-                  className="px-4 py-2 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors text-sm border border-blue-200 cursor-pointer"
+                  className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors text-xs sm:text-sm border border-blue-200 cursor-pointer"
                 >
                   {msg}
                 </button>
               ))}
             </div>
-            <form onSubmit={handleSendMessage} className="flex items-end gap-3">
+            <form
+              onSubmit={handleSendMessage}
+              className="flex items-end gap-2 sm:gap-3"
+            >
               <Textarea
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="메시지를 입력하세요..."
-                className="min-h-[56px] max-h-[200px] resize-none rounded-xl border-input bg-background px-4 py-3.5 text-[15px] leading-relaxed focus-visible:ring-blue-600"
+                className="min-h-[48px] sm:min-h-[56px] max-h-[200px] resize-none rounded-xl border-input bg-background px-3 sm:px-4 py-2.5 sm:py-3.5 text-[13px] sm:text-[15px] leading-relaxed focus-visible:ring-blue-600"
                 rows={1}
               />
               <Button
                 type="submit"
                 size="icon"
-                className="h-[56px] w-[56px] shrink-0 rounded-xl bg-blue-600 hover:bg-blue-700"
+                className="h-[48px] w-[48px] sm:h-[56px] sm:w-[56px] shrink-0 rounded-xl bg-blue-600 hover:bg-blue-700"
                 disabled={!inputValue.trim()}
               >
-                <Send className="h-5 w-5" />
+                <Send className="h-4 w-4 sm:h-5 sm:w-5" />
                 <span className="sr-only">전송</span>
               </Button>
             </form>
