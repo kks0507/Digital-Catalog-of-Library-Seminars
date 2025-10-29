@@ -1,5 +1,6 @@
 version: 1.0
-runtime: nodejs20
+runtime: nodejs18
+
 build:
   commands:
     build:
@@ -7,6 +8,7 @@ build:
       - yarn install --frozen-lockfile --ignore-engines
       - echo "Building the application"
       - NODE_OPTIONS="--max-old-space-size=4096" yarn build
+
 run:
   command: yarn start
   network:
