@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -12,6 +12,14 @@ import {
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
   Upload,
   FileText,
   Play,
@@ -22,6 +30,7 @@ import {
   Video,
   FileImage,
   Table,
+  Info,
 } from "lucide-react";
 
 type AppStep =
@@ -55,6 +64,8 @@ export default function PdfToVideo() {
   const [step, setStep] = useState<AppStep>("UPLOAD");
   const [fileName, setFileName] = useState<string | null>(null);
   const [progress, setProgress] = useState(0);
+  const [showSampleModal, setShowSampleModal] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Mock parsed content
   const mockParsedContent: ParsedContent = {
@@ -106,6 +117,18 @@ export default function PdfToVideo() {
 
 ## 5. 결론
 AI 기반 검색 시스템은 학술 연구 환경에서 효과적인 정보 검색을 지원하며, 향후 더 많은 도서관에서 도입될 것으로 기대됩니다.`;
+
+  const handleFileSelectClick = () => {
+    setShowSampleModal(true);
+  };
+
+  const handleModalConfirm = () => {
+    setShowSampleModal(false);
+    // 모달 닫은 후 파일 선택 다이얼로그 열기
+    setTimeout(() => {
+      fileInputRef.current?.click();
+    }, 100);
+  };
 
   const handleFileUpload = (file: File) => {
     setFileName(file.name);
@@ -167,6 +190,47 @@ AI 기반 검색 시스템은 학술 연구 환경에서 효과적인 정보 검
         </CardHeader>
       </Card>
 
+      {/* Sample Data Modal */}
+      <Dialog open={showSampleModal} onOpenChange={setShowSampleModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-100">
+                <Info className="h-5 w-5 text-blue-600" />
+              </div>
+              <DialogTitle className="text-xl">샘플 데이터 안내</DialogTitle>
+            </div>
+            <DialogDescription className="text-base text-gray-700 pt-2">
+              현재 이 기능은 샘플 데이터를 사용한 데모 버전입니다.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <div className="bg-blue-50 border-l-4 border-blue-600 rounded-r-lg p-4">
+              <p className="text-sm text-gray-700 leading-relaxed">
+                실제 PDF 파일을 업로드하더라도 샘플 데이터로 시연됩니다. 본
+                시스템은 현재 프로토타입 단계이며, 실제 PDF 파싱 및 영상 생성
+                기능은 개발 중입니다.
+              </p>
+            </div>
+          </div>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              variant="outline"
+              onClick={() => setShowSampleModal(false)}
+              className="flex-1 sm:flex-none"
+            >
+              취소
+            </Button>
+            <Button
+              onClick={handleModalConfirm}
+              className="bg-blue-600 hover:bg-blue-700 text-white flex-1 sm:flex-none"
+            >
+              확인
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Step 1: Upload */}
       {step === "UPLOAD" && (
         <Card>
@@ -178,6 +242,7 @@ AI 기반 검색 시스템은 학술 연구 환경에서 효과적인 정보 검
                 논문 PDF 파일을 드래그하거나 클릭하여 업로드하세요
               </p>
               <input
+                ref={fileInputRef}
                 type="file"
                 accept=".pdf"
                 onChange={(e) =>
@@ -186,11 +251,7 @@ AI 기반 검색 시스템은 학술 연구 환경에서 효과적인 정보 검
                 className="hidden"
                 id="pdf-upload"
               />
-              <Button asChild>
-                <label htmlFor="pdf-upload" className="cursor-pointer">
-                  파일 선택
-                </label>
-              </Button>
+              <Button onClick={handleFileSelectClick}>파일 선택</Button>
             </div>
           </CardContent>
         </Card>
