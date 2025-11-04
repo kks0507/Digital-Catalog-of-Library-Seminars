@@ -555,7 +555,7 @@ export default function ChatbotPage() {
             </div>
             <div>
               <h2 className="text-lg font-semibold text-foreground">
-                통합 AI 챗봇 (Ragso)
+                통합 AI 챗봇 (biblo)
               </h2>
               <p className="text-sm text-muted-foreground">
                 좌석 예약 & 도서 추천 서비스
@@ -572,7 +572,7 @@ export default function ChatbotPage() {
                 <p className="text-base text-muted-foreground">
                   안녕하세요, 궁금한 내용이 있으신가요?
                   <br />
-                  챗봇(Ragso)가 필요한 정보를 찾아 드릴게요!
+                  챗봇(biblo)가 필요한 정보를 찾아 드릴게요!
                 </p>
               </div>
             )}
