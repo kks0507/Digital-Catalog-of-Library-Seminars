@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   Upload,
   User,
@@ -23,6 +31,7 @@ import {
   Play,
   RotateCcw,
   Loader2,
+  Info,
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
@@ -100,6 +109,10 @@ export default function AssistantPage() {
   const [profileProgress, setProfileProgress] = useState(0);
   const [isProfileParsing, setIsProfileParsing] = useState(false);
   const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [showSampleModal, setShowSampleModal] = useState(false);
+  const [showVideoSampleModal, setShowVideoSampleModal] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const videoFileInputRef = useRef<HTMLInputElement>(null);
   const [profileData, setProfileData] = useState({
     coreTopics: "LLM, 인지 심리, 인간-컴퓨터 상호작용(HCI)",
     methodologies: "실험 설계, 통계 분석, fMRI 데이터 분석",
@@ -121,6 +134,18 @@ export default function AssistantPage() {
   const [searchType, setSearchType] = useState<"internal" | "external">(
     "internal"
   );
+
+  const handleFileSelectClick = () => {
+    setShowSampleModal(true);
+  };
+
+  const handleModalConfirm = () => {
+    setShowSampleModal(false);
+    // 모달 닫은 후 파일 선택 다이얼로그 열기
+    setTimeout(() => {
+      fileInputRef.current?.click();
+    }, 100);
+  };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -198,6 +223,18 @@ export default function AssistantPage() {
   };
 
   // PDF to Video 핸들러들
+  const handleVideoFileSelectClick = () => {
+    setShowVideoSampleModal(true);
+  };
+
+  const handleVideoModalConfirm = () => {
+    setShowVideoSampleModal(false);
+    // 모달 닫은 후 파일 선택 다이얼로그 열기
+    setTimeout(() => {
+      videoFileInputRef.current?.click();
+    }, 100);
+  };
+
   const handleVideoFileUpload = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -433,7 +470,56 @@ export default function AssistantPage() {
                       </CardHeader>
                       <CardContent>
                         <div className="space-y-4">
+                          {/* Sample Data Modal */}
+                          <Dialog
+                            open={showSampleModal}
+                            onOpenChange={setShowSampleModal}
+                          >
+                            <DialogContent className="sm:max-w-md">
+                              <DialogHeader>
+                                <div className="flex items-center gap-3 mb-2">
+                                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-100">
+                                    <Info className="h-5 w-5 text-blue-600" />
+                                  </div>
+                                  <DialogTitle className="text-xl">
+                                    샘플 데이터 안내
+                                  </DialogTitle>
+                                </div>
+                                <DialogDescription className="text-base text-gray-700 pt-2">
+                                  현재 이 기능은 샘플 데이터를 사용한 데모
+                                  버전입니다.
+                                </DialogDescription>
+                              </DialogHeader>
+                              <div className="py-4">
+                                <div className="bg-blue-50 border-l-4 border-blue-600 rounded-r-lg p-4">
+                                  <p className="text-sm text-gray-700 leading-relaxed">
+                                    실제 PDF 파일을 업로드하더라도 샘플 데이터로
+                                    시연됩니다. 본 시스템은 현재 프로토타입
+                                    단계이며, 실제 PDF 파싱 및 프로필 생성
+                                    기능은 개발 중입니다.
+                                  </p>
+                                </div>
+                              </div>
+                              <DialogFooter className="gap-2 sm:gap-0">
+                                <Button
+                                  variant="outline"
+                                  onClick={() => setShowSampleModal(false)}
+                                  className="flex-1 sm:flex-none"
+                                >
+                                  취소
+                                </Button>
+                                <Button
+                                  onClick={handleModalConfirm}
+                                  className="bg-blue-600 hover:bg-blue-700 text-white flex-1 sm:flex-none"
+                                >
+                                  확인
+                                </Button>
+                              </DialogFooter>
+                            </DialogContent>
+                          </Dialog>
+
                           <input
+                            ref={fileInputRef}
                             type="file"
                             id="file-upload"
                             onChange={handleFileUpload}
@@ -441,8 +527,8 @@ export default function AssistantPage() {
                             multiple
                             className="hidden"
                           />
-                          <label
-                            htmlFor="file-upload"
+                          <div
+                            onClick={handleFileSelectClick}
                             className="block border-2 border-dashed border-gray-300 rounded-lg p-12 text-center hover:border-blue-500 transition-colors cursor-pointer bg-gray-50"
                           >
                             <Upload className="h-12 w-12 mx-auto mb-4 text-blue-600" />
@@ -452,7 +538,7 @@ export default function AssistantPage() {
                             <div className="text-sm text-gray-500">
                               여러 PDF 파일을 한 번에 선택할 수 있습니다
                             </div>
-                          </label>
+                          </div>
 
                           {/* 업로드된 파일 목록 */}
                           {uploadedFiles.length > 0 && (
@@ -1392,26 +1478,75 @@ export default function AssistantPage() {
                     </CardHeader>
                     <CardContent>
                       {!videoFile ? (
-                        <div className="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center hover:border-blue-500 transition-colors cursor-pointer bg-gray-50">
-                          <input
-                            type="file"
-                            id="pdf-upload"
-                            onChange={handleVideoFileUpload}
-                            accept="application/pdf"
-                            className="hidden"
-                          />
-                          <label
-                            htmlFor="pdf-upload"
-                            className="cursor-pointer"
+                        <>
+                          {/* Sample Data Modal for Video */}
+                          <Dialog
+                            open={showVideoSampleModal}
+                            onOpenChange={setShowVideoSampleModal}
                           >
+                            <DialogContent className="sm:max-w-md">
+                              <DialogHeader>
+                                <div className="flex items-center gap-3 mb-2">
+                                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-100">
+                                    <Info className="h-5 w-5 text-blue-600" />
+                                  </div>
+                                  <DialogTitle className="text-xl">
+                                    샘플 데이터 안내
+                                  </DialogTitle>
+                                </div>
+                                <DialogDescription className="text-base text-gray-700 pt-2">
+                                  현재 이 기능은 샘플 데이터를 사용한 데모
+                                  버전입니다.
+                                </DialogDescription>
+                              </DialogHeader>
+                              <div className="py-4">
+                                <div className="bg-blue-50 border-l-4 border-blue-600 rounded-r-lg p-4">
+                                  <p className="text-sm text-gray-700 leading-relaxed">
+                                    실제 PDF 파일을 업로드하더라도 샘플 데이터로
+                                    시연됩니다. 본 시스템은 현재 프로토타입
+                                    단계이며, 실제 PDF 파싱 및 영상 생성 기능은
+                                    개발 중입니다.
+                                  </p>
+                                </div>
+                              </div>
+                              <DialogFooter className="gap-2 sm:gap-0">
+                                <Button
+                                  variant="outline"
+                                  onClick={() => setShowVideoSampleModal(false)}
+                                  className="flex-1 sm:flex-none"
+                                >
+                                  취소
+                                </Button>
+                                <Button
+                                  onClick={handleVideoModalConfirm}
+                                  className="bg-blue-600 hover:bg-blue-700 text-white flex-1 sm:flex-none"
+                                >
+                                  확인
+                                </Button>
+                              </DialogFooter>
+                            </DialogContent>
+                          </Dialog>
+
+                          <div
+                            onClick={handleVideoFileSelectClick}
+                            className="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center hover:border-blue-500 transition-colors cursor-pointer bg-gray-50"
+                          >
+                            <input
+                              ref={videoFileInputRef}
+                              type="file"
+                              id="pdf-upload"
+                              onChange={handleVideoFileUpload}
+                              accept="application/pdf"
+                              className="hidden"
+                            />
                             <div className="text-blue-600 font-medium">
                               클릭하여 파일 선택
                             </div>
                             <div className="text-sm text-gray-500 mt-1">
                               (또는 드래그 앤 드롭)
                             </div>
-                          </label>
-                        </div>
+                          </div>
+                        </>
                       ) : (
                         <div className="bg-gray-100 rounded-lg p-6 text-center space-y-4">
                           <p className="text-sm">
