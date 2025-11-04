@@ -194,19 +194,21 @@ AI 기반 검색 시스템은 학술 연구 환경에서 효과적인 정보 검
       <Dialog open={showSampleModal} onOpenChange={setShowSampleModal}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <div className="flex items-center gap-3 mb-2">
-              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-100">
-                <Info className="h-5 w-5 text-blue-600" />
+            <div className="flex items-center gap-2 sm:gap-3 mb-2">
+              <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-blue-100 flex-shrink-0">
+                <Info className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
               </div>
-              <DialogTitle className="text-xl">샘플 데이터 안내</DialogTitle>
+              <DialogTitle className="text-lg sm:text-xl break-words">
+                샘플 데이터 안내
+              </DialogTitle>
             </div>
-            <DialogDescription className="text-base text-gray-700 pt-2">
+            <DialogDescription className="text-sm sm:text-base text-gray-700 pt-2 break-words">
               현재 이 기능은 샘플 데이터를 사용한 데모 버전입니다.
             </DialogDescription>
           </DialogHeader>
-          <div className="py-4">
-            <div className="bg-blue-50 border-l-4 border-blue-600 rounded-r-lg p-4">
-              <p className="text-sm text-gray-700 leading-relaxed">
+          <div className="py-3 sm:py-4">
+            <div className="bg-blue-50 border-l-4 border-blue-600 rounded-r-lg p-3 sm:p-4">
+              <p className="text-xs sm:text-sm text-gray-700 leading-relaxed break-words">
                 실제 PDF 파일을 업로드하더라도 샘플 데이터로 시연됩니다. 본
                 시스템은 현재 프로토타입 단계이며, 실제 PDF 파싱 및 영상 생성
                 기능은 개발 중입니다.
